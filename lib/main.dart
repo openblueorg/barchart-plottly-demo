@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_charts/material_charts.dart';
+
 import 'dart:async';
 import 'dart:math';
 
@@ -43,7 +44,7 @@ class BarChartDemo extends StatefulWidget {
 }
 
 class _BarChartDemoState extends State<BarChartDemo> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
   StreamController<List<double>>? _streamController;
   Timer? _dataTimer;
   List<double> _streamData = [45, 78, 32, 89, 56, 67, 23, 91];
@@ -324,33 +325,66 @@ class _BarChartDemoState extends State<BarChartDemo> {
   Widget _buildJsonChart() {
     final jsonConfig = {
       "data": [
-        {"x": "Jan", "y": 45, "color": "#F1C40F"},
-        {"x": "Feb", "y": 78, "color": "#E67E22"},
-        {"x": "Mar", "y": 32, "color": "#1ABC9C"},
-        {"x": "Apr", "y": 89, "color": "#3498DB"},
-        {"x": "May", "y": 56, "color": "#9B59B6"},
-        {"x": "Jun", "y": 67, "color": "#2ECC71"},
-        {"x": "Jul", "y": 23, "color": "#E74C3C"},
-        {"x": "Aug", "y": 91, "color": "#34495E"},
+        {
+          "type": "bar",
+          "x": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
+          "y": [45, 78, 32, 89, 56, 67, 23, 91],
+          "marker": {
+            "color": ["#F1C40F", "#E67E22", "#1ABC9C", "#3498DB",
+                      "#9B59B6", "#2ECC71", "#E74C3C", "#34495E"],
+            "colorscale": ["#B8D4E3", "#7B9E87"],  
+          }
+        }
       ],
-      "style": {
+      "layout": {
         "width": 800,
         "height": 300,
-        "showGrid": true,
-        "showValues": true,
-        "padding": {"left": 32, "top": 32, "right": 32, "bottom": 32},
-        "horizontalGridLines": 6,
-        "interactive": true,
-        "barColor": "#7B9E87",
-        "gridColor": "#34495E",
-        "backgroundColor": "#16213E",
-        "barSpacing": 0.3,
-        "cornerRadius": 12.0,
-        "animationDuration": 2000,
-        "animationCurve": "easeInOut",
-        "gradientEffect": true,
-        "gradientColors": ["#B8D4E3", "#7B9E87"],
-      },
+        "plot_bgcolor": "#16213E",
+        "paper_bgcolor": "#16213E",
+        "showlegend": false,
+        
+        "bargap": 0.3,              
+        "bargroupgap": 0.1,         
+        
+        "xaxis": {
+          "showgrid": true,
+          "gridcolor": "#34495E",
+          "tickfont": {
+            "size": 16,
+            "color": "#E8F4F8"
+          },
+          "tickcolor": "#E8F4F8",
+          "title": {
+            "text": "Months",
+            "font": {
+              "size": 18,
+              "color": "#E8F4F8"
+            }
+          }
+        },
+        "yaxis": {
+          "showgrid": true,
+          "gridcolor": "#34495E",
+          "nticks": 6,
+          "tickfont": {
+            "size": 14,
+            "color": "#E8F4F8"
+          },
+          "tickcolor": "#E8F4F8",
+          "title": {
+            "text": "Values",
+            "font": {
+              "size": 18,
+              "color": "#E8F4F8"
+            }
+          }
+        },
+        
+        "font": {
+          "size": 12,
+          "color": "#E8F4F8"
+        }
+      }
     };
 
     return Container(
@@ -359,7 +393,7 @@ class _BarChartDemoState extends State<BarChartDemo> {
       height: 400,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E), // Dark container
+        color: const Color(0xFF16213E),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
