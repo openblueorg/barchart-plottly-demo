@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'dart:async';
-import 'dart:math';
-
 import 'material_charts/material_charts.dart';
-
 
 void main() {
   runApp(const MyApp());
@@ -17,89 +12,46 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Material Charts Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
-      home: const StackedBarChartDemo(),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      home: const LineChartDemo(),
     );
   }
 }
 
-/// Demo showing MaterialStackedBarChart with the exact same API patterns
-/// as your existing MaterialBarChart implementation.
-class StackedBarChartDemo extends StatefulWidget {
-  const StackedBarChartDemo({super.key});
+/// Simple line chart demo
+class LineChartDemo extends StatefulWidget {
+  const LineChartDemo({super.key});
 
   @override
-  State<StackedBarChartDemo> createState() => _StackedBarChartDemoState();
+  State<LineChartDemo> createState() => _LineChartDemoState();
 }
 
-class _StackedBarChartDemoState extends State<StackedBarChartDemo> {
+class _LineChartDemoState extends State<LineChartDemo> {
   int _currentIndex = 0;
-  StreamController<List<List<double>>>? _streamController;
-  Timer? _dataTimer;
-  List<List<double>> _streamData = [
-    [45, 78, 32, 89], // Series 1
-    [35, 52, 44, 67], // Series 2
-    [25, 33, 28, 44], // Series 3
+  
+  // Sample data for the line chart
+  final List<ChartData> _chartData = [
+    const ChartData(value: 20, label: 'Jan'),
+    const ChartData(value: 35, label: 'Feb'),
+    const ChartData(value: 28, label: 'Mar'),
+    const ChartData(value: 45, label: 'Apr'),
+    const ChartData(value: 52, label: 'May'),
+    const ChartData(value: 38, label: 'Jun'),
+    const ChartData(value: 65, label: 'Jul'),
+    const ChartData(value: 72, label: 'Aug'),
+    const ChartData(value: 58, label: 'Sep'),
+    const ChartData(value: 48, label: 'Oct'),
+    const ChartData(value: 55, label: 'Nov'),
+    const ChartData(value: 68, label: 'Dec'),
   ];
-
-  // Animation keys for each chart type
-  final List<GlobalKey> _chartKeys = List.generate(4, (index) => GlobalKey());
-
-  // Animation trigger state
-  int _animationTrigger = 0;
-
-  // Aesthetically pleasing pastel color palette
-  static const List<Color> pastelColors = [
-    Color(0xFFB8D4E3), // Soft blue
-    Color(0xFFC7E8CA), // Mint green
-    Color(0xFFF4D1AE), // Peach
-    Color(0xFFE6B8AF), // Dusty rose
-    Color(0xFFD4C5F9), // Lavender
-    Color(0xFFF7D794), // Soft yellow
-    Color(0xFFB8E6B8), // Light green
-    Color(0xFFE8D5C4), // Beige
-  ];
-
-  // Pastel color hex strings for charts
-  static const List<String> pastelColorHex = [
-    '#B8D4E3', // Soft blue
-    '#C7E8CA', // Mint green
-    '#F4D1AE', // Peach
-    '#E6B8AF', // Dusty rose
-    '#D4C5F9', // Lavender
-    '#F7D794', // Soft yellow
-    '#B8E6B8', // Light green
-    '#E8D5C4', // Beige
-  ];
-
-  @override
-  void dispose() {
-    _dataTimer?.cancel();
-    _streamController?.close();
-    super.dispose();
-  }
-
-  void _triggerAnimation() {
-    setState(() {
-      _animationTrigger++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Stacked Bar Chart Demo',
-          style: TextStyle(
-            fontWeight: FontWeight.w300,
-            color: Color(0xFFE8F4F8),
-          ),
-        ),
+        title: const Text('Line Chart Demo'),
         backgroundColor: const Color(0xFF16213E),
+        foregroundColor: Colors.white,
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -107,8 +59,8 @@ class _StackedBarChartDemoState extends State<StackedBarChartDemo> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF1A1A2E), // Dark navy
-              Color(0xFF0F3460), // Darker blue
+              Color(0xFF1A1A2E),
+              Color(0xFF0F3460),
             ],
           ),
         ),
@@ -119,7 +71,7 @@ class _StackedBarChartDemoState extends State<StackedBarChartDemo> {
               margin: const EdgeInsets.all(16.0),
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E), // Dark container
+                color: const Color(0xFF16213E),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -133,18 +85,19 @@ class _StackedBarChartDemoState extends State<StackedBarChartDemo> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildTabButton(0, 'Traditional API'),
+                  _buildTabButton(0, 'Basic Line Chart'),
                   const SizedBox(width: 12),
-                  _buildTabButton(1, 'Simple Data Arrays'),
-                  const SizedBox(width: 12),
-                  _buildTabButton(2, 'JSON Configuration'),
-
+                  _buildTabButton(1, 'Curved Line Chart'),
                 ],
               ),
             ),
-
+            
             // Chart content
-            Expanded(child: Center(child: _buildCurrentChart())),
+            Expanded(
+              child: Center(
+                child: _buildCurrentChart(),
+              ),
+            ),
           ],
         ),
       ),
@@ -158,15 +111,14 @@ class _StackedBarChartDemoState extends State<StackedBarChartDemo> {
         setState(() {
           _currentIndex = index;
         });
-        _triggerAnimation();
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: isSelected
-            ? const Color(0xFF7B9E87) // Sage green when selected
+            ? const Color(0xFF7B9E87)
             : Colors.transparent,
         foregroundColor: isSelected
-            ? const Color(0xFF1A1A2E) // Dark text on light background
-            : const Color(0xFFE8F4F8), // Light text when not selected
+            ? const Color(0xFF1A1A2E)
+            : const Color(0xFFE8F4F8),
         elevation: 0,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -187,234 +139,18 @@ class _StackedBarChartDemoState extends State<StackedBarChartDemo> {
   Widget _buildCurrentChart() {
     switch (_currentIndex) {
       case 0:
-        return _buildTraditionalChart();
+        return _buildBasicLineChart();
       case 1:
-        return _buildSimpleDataChart();
-      case 2:
-        return _buildJsonChart();
-
+        return _buildCurvedLineChart();
       default:
-        return _buildTraditionalChart();
+        return _buildBasicLineChart();
     }
   }
 
-  /// Traditional API using StackedBarData objects directly
-  Widget _buildTraditionalChart() {
+  /// Basic line chart with simple styling
+  Widget _buildBasicLineChart() {
     return Container(
-      key: _chartKeys[0],
-      width: 1000,
-      height: 400,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF16213E), // Dark container
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-        border: Border.all(color: const Color(0xFF2C3E50), width: 1),
-      ),
-      child: MaterialStackedBarChart(
-        data: [
-          StackedBarData(
-            label: 'Q1',
-            segments: [
-              StackedBarSegment(value: 45, color: pastelColors[0], label: 'Sales'),
-              StackedBarSegment(value: 35, color: pastelColors[1], label: 'Marketing'),
-              StackedBarSegment(value: 25, color: pastelColors[2], label: 'Operations'),
-            ],
-          ),
-          StackedBarData(
-            label: 'Q2',
-            segments: [
-              StackedBarSegment(value: 78, color: pastelColors[0], label: 'Sales'),
-              StackedBarSegment(value: 52, color: pastelColors[1], label: 'Marketing'),
-              StackedBarSegment(value: 33, color: pastelColors[2], label: 'Operations'),
-            ],
-          ),
-          StackedBarData(
-            label: 'Q3',
-            segments: [
-              StackedBarSegment(value: 32, color: pastelColors[0], label: 'Sales'),
-              StackedBarSegment(value: 44, color: pastelColors[1], label: 'Marketing'),
-              StackedBarSegment(value: 28, color: pastelColors[2], label: 'Operations'),
-            ],
-          ),
-          StackedBarData(
-            label: 'Q4',
-            segments: [
-              StackedBarSegment(value: 89, color: pastelColors[0], label: 'Sales'),
-              StackedBarSegment(value: 67, color: pastelColors[1], label: 'Marketing'),
-              StackedBarSegment(value: 44, color: pastelColors[2], label: 'Operations'),
-            ],
-          ),
-        ],
-        width: 800,
-        height: 300,
-        style: StackedBarChartStyle(
-          gridColor: const Color(0xFF34495E), // Darker grid for contrast
-          backgroundColor: const Color(0xFF16213E), // Dark background
-          barSpacing: 0.3,
-          cornerRadius: 12.0,
-          animationDuration: const Duration(milliseconds: 2000),
-          animationCurve: Curves.easeInOut,
-          labelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFFE8F4F8), // Light text for dark background
-          ),
-          valueStyle: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A2E), // Dark text on light bars
-          ),
-        ),
-        showGrid: true,
-        showValues: true,
-        padding: const EdgeInsets.all(32),
-        horizontalGridLines: 6,
-        interactive: true,
-        onAnimationComplete: () {
-          print('Traditional stacked chart animation completed! (Trigger: $_animationTrigger)');
-        },
-      ),
-    );
-  }
-
-  /// Simple data arrays - matches your MaterialBarChart.fromData() API exactly
-  Widget _buildSimpleDataChart() {
-    return Container(
-      key: _chartKeys[1],
-      width: 1000,
-      height: 400,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF16213E), // Dark container
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-        border: Border.all(color: const Color(0xFF2C3E50), width: 1),
-      ),
-      child: MaterialStackedBarChart.fromData(
-        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-        values: [
-          [45, 78, 32, 89], // Sales data for each quarter
-          [35, 52, 44, 67], // Marketing data for each quarter
-          [25, 33, 28, 44], // Operations data for each quarter
-        ],
-        seriesLabels: ['Sales', 'Marketing', 'Operations'],
-        colors: [pastelColorHex[0], pastelColorHex[1], pastelColorHex[2]],
-        width: 800,
-        height: 300,
-        showGrid: true,
-        showValues: true,
-        padding: const EdgeInsets.all(32),
-        horizontalGridLines: 6,
-        interactive: true,
-        style: {
-          'barSpacing': 0.3,
-          'cornerRadius': 12.0,
-          'animationDuration': 2000,
-          'animationCurve': 'easeInOut',
-          'gridColor': '#34495E', // Darker grid
-          'backgroundColor': '#16213E', // Dark background
-        },
-        onAnimationComplete: () {
-          print('Simple data stacked chart animation completed! (Trigger: $_animationTrigger)');
-        },
-      ),
-    );
-  }
-
-  /// JSON configuration - supports both simple and Plotly formats
-  Widget _buildJsonChart() {
-    // Plotly-style JSON configuration
-    final jsonConfig = {
-      "data": [
-        {
-          "type": "bar",
-          "x": ["Q1", "Q2", "Q3", "Q4"],
-          "y": [45, 78, 32, 89],
-          "name": "Sales",
-          "marker": {"color": "#B8D4E3"}
-        },
-        {
-          "type": "bar",
-          "x": ["Q1", "Q2", "Q3", "Q4"],
-          "y": [35, 52, 44, 67],
-          "name": "Marketing",
-          "marker": {"color": "#C7E8CA"}
-        },
-        {
-          "type": "bar",
-          "x": ["Q1", "Q2", "Q3", "Q4"],
-          "y": [25, 33, 28, 44],
-          "name": "Operations",
-          "marker": {"color": "#F4D1AE"}
-        }
-      ],
-      "layout": {
-        "barmode": "stack",
-        "width": 800,
-        "height": 300,
-        "plot_bgcolor": "#16213E",
-        "paper_bgcolor": "#16213E",
-        "bargap": 0.3,
-        "showValues": true,
-        "valueStyle": {
-          "color": "#000000",
-          "size": 12,
-          "weight": "bold"
-        },
-        "xaxis": {
-          "showgrid": true,
-          "gridcolor": "#34495E",
-          "tickfont": {
-            "size": 12,
-            "color": "#E8F4F8"
-          },
-          "title": {
-            "text": "Quarter",
-            "font": {
-              "size": 14,
-              "color": "#E8F4F8"
-            }
-          }
-        },
-        "yaxis": {
-          "showgrid": true,
-          "gridcolor": "#34495E",
-          "nticks": 6,
-          "tickfont": {
-            "size": 12,
-            "color": "#E8F4F8"
-          },
-          "title": {
-            "text": "Revenue",
-            "font": {
-              "size": 14,
-              "color": "#E8F4F8"
-            }
-          }
-        },
-        "font": {
-          "size": 12,
-          "color": "#E8F4F8"
-        }
-      }
-    };
-
-    return Container(
-      key: _chartKeys[2],
-      width: 1000,
+      width: 800,
       height: 400,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -429,7 +165,75 @@ class _StackedBarChartDemoState extends State<StackedBarChartDemo> {
         ],
         border: Border.all(color: const Color(0xFF2C3E50), width: 1),
       ),
-      child: MaterialStackedBarChart.fromJson(jsonConfig),
+      child: MaterialChartLine(
+        data: _chartData,
+        width: 750,
+        height: 350,
+        style: const LineChartStyle(
+          lineColor: Color(0xFF4CAF50),
+          pointColor: Color(0xFF4CAF50),
+          backgroundColor: Color(0xFF16213E),
+          gridColor: Color(0xFF34495E),
+          strokeWidth: 3.0,
+          pointRadius: 5.0,
+          animationDuration: Duration(milliseconds: 2000),
+          animationCurve: Curves.easeInOut,
+        ),
+        showPoints: true,
+        showGrid: true,
+        showTooltips: true,
+        padding: const EdgeInsets.all(32),
+        horizontalGridLines: 6,
+        onAnimationComplete: () {
+          print('Basic line chart animation completed!');
+        },
+      ),
+    );
+  }
+
+  /// Curved line chart with smooth curves
+  Widget _buildCurvedLineChart() {
+    return Container(
+      width: 800,
+      height: 400,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16213E),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+        border: Border.all(color: const Color(0xFF2C3E50), width: 1),
+      ),
+      child: MaterialChartLine(
+        data: _chartData,
+        width: 750,
+        height: 350,
+        style: const LineChartStyle(
+          lineColor: Color(0xFF2196F3),
+          pointColor: Color(0xFF2196F3),
+          backgroundColor: Color(0xFF16213E),
+          gridColor: Color(0xFF34495E),
+          strokeWidth: 3.0,
+          pointRadius: 5.0,
+          useCurvedLines: true,
+          curveIntensity: 0.5,
+          animationDuration: Duration(milliseconds: 2500),
+          animationCurve: Curves.easeInOut,
+        ),
+        showPoints: true,
+        showGrid: true,
+        showTooltips: true,
+        padding: const EdgeInsets.all(32),
+        horizontalGridLines: 6,
+        onAnimationComplete: () {
+          print('Curved line chart animation completed!');
+        },
+      ),
     );
   }
 }
