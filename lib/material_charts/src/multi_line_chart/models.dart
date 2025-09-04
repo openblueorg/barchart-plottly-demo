@@ -15,11 +15,7 @@ class ChartDataPoint {
   ///
   /// [value] is required to define the data point.
   /// [label] and [color] are optional.
-  const ChartDataPoint({
-    required this.value,
-    this.label,
-    this.color,
-  });
+  const ChartDataPoint({required this.value, this.label, this.color});
 
   /// Creates a [ChartDataPoint] instance from a JSON map.
   /// Supports both simple and Plotly-compatible formats.
@@ -68,7 +64,7 @@ class ChartDataPoint {
 
   /// Helper method to convert Color to hex string
   static String _colorToHex(Color color) {
-    return '#${color.value.toRadixString(16).padLeft(8, '0')}';
+    return '#${color.toARGB32().toRadixString(16).padLeft(8, '0')}';
   }
 }
 
@@ -80,7 +76,7 @@ class ChartDataPoint {
 /// of the tooltip.
 class TooltipData {
   final String
-      seriesName; // The name of the series to which the data point belongs.
+  seriesName; // The name of the series to which the data point belongs.
   final ChartDataPoint dataPoint; // The data point associated with the tooltip.
   final Color color; // The color of the tooltip.
   final Offset position; // The position of the tooltip on the screen.
@@ -134,23 +130,27 @@ class MultiLineTooltipStyle {
   /// Supports both simple and Plotly-compatible formats.
   factory MultiLineTooltipStyle.fromJson(Map<String, dynamic> json) {
     return MultiLineTooltipStyle(
-      textStyle: _parseTextStyle(json['textStyle'] ?? json['font']) ??
+      textStyle:
+          _parseTextStyle(json['textStyle'] ?? json['font']) ??
           const TextStyle(
             color: Colors.white,
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
-      backgroundColor: json['backgroundColor'] != null
-          ? ChartDataPoint._parseColor(json['backgroundColor'])
-          : json['bgcolor'] != null
+      backgroundColor:
+          json['backgroundColor'] != null
+              ? ChartDataPoint._parseColor(json['backgroundColor'])
+              : json['bgcolor'] != null
               ? ChartDataPoint._parseColor(json['bgcolor'])
               : Colors.black,
       padding: (json['padding'] ?? 8.0).toDouble(),
       threshold: (json['threshold'] ?? 10.0).toDouble(),
-      borderRadius: (json['borderRadius'] ?? json['borderradius'] ?? 4.0).toDouble(),
-      shadowColor: json['shadowColor'] != null
-          ? ChartDataPoint._parseColor(json['shadowColor'])
-          : Colors.black,
+      borderRadius:
+          (json['borderRadius'] ?? json['borderradius'] ?? 4.0).toDouble(),
+      shadowColor:
+          json['shadowColor'] != null
+              ? ChartDataPoint._parseColor(json['shadowColor'])
+              : Colors.black,
       shadowBlurRadius: (json['shadowBlurRadius'] ?? 3.0).toDouble(),
       indicatorHeight: (json['indicatorHeight'] ?? 2.0).toDouble(),
     );
@@ -166,9 +166,10 @@ class MultiLineTooltipStyle {
         fontWeight: _parseFontWeight(
           textStyle['weight'] ?? textStyle['fontWeight'],
         ),
-        color: textStyle['color'] != null
-            ? ChartDataPoint._parseColor(textStyle['color'])
-            : Colors.white,
+        color:
+            textStyle['color'] != null
+                ? ChartDataPoint._parseColor(textStyle['color'])
+                : Colors.white,
       );
     }
 
@@ -218,7 +219,7 @@ class MultiLineTooltipStyle {
 class ChartSeries {
   final String name; // The name of the data series.
   final List<ChartDataPoint>
-      dataPoints; // The list of data points in the series.
+  dataPoints; // The list of data points in the series.
   final Color? color; // Optional color for the series line.
   final bool? showPoints; // Flag to determine if points should be displayed.
   final bool? smoothLine; // Flag to determine if the line should be smooth.
@@ -243,54 +244,65 @@ class ChartSeries {
   /// Supports both simple and Plotly-compatible formats.
   factory ChartSeries.fromJson(Map<String, dynamic> json) {
     List<ChartDataPoint> dataPoints = [];
-    
+
     // Handle Plotly format: x and y as arrays
     if (json['x'] is List && json['y'] is List) {
       final xValues = json['x'] as List;
       final yValues = json['y'] as List;
-      
+
       for (int i = 0; i < xValues.length && i < yValues.length; i++) {
-        dataPoints.add(ChartDataPoint(
-          value: yValues[i].toDouble(),
-          label: xValues[i]?.toString(),
-        ));
+        dataPoints.add(
+          ChartDataPoint(
+            value: yValues[i].toDouble(),
+            label: xValues[i]?.toString(),
+          ),
+        );
       }
     }
     // Handle simple format: dataPoints as array of objects
     else if (json['dataPoints'] is List) {
       final points = json['dataPoints'] as List;
-      dataPoints = points
-          .map((point) => ChartDataPoint.fromJson(point as Map<String, dynamic>))
-          .toList();
+      dataPoints =
+          points
+              .map(
+                (point) =>
+                    ChartDataPoint.fromJson(point as Map<String, dynamic>),
+              )
+              .toList();
     }
     // Handle data as array of individual points
     else if (json['data'] is List) {
       final points = json['data'] as List;
-      dataPoints = points
-          .map((point) => ChartDataPoint.fromJson(point as Map<String, dynamic>))
-          .toList();
+      dataPoints =
+          points
+              .map(
+                (point) =>
+                    ChartDataPoint.fromJson(point as Map<String, dynamic>),
+              )
+              .toList();
     }
 
     return ChartSeries(
       name: json['name'] ?? json['title'] ?? 'Series',
       dataPoints: dataPoints,
-      color: json['color'] != null 
-          ? ChartDataPoint._parseColor(json['color'])
-          : json['line']?['color'] != null
+      color:
+          json['color'] != null
+              ? ChartDataPoint._parseColor(json['color'])
+              : json['line']?['color'] != null
               ? ChartDataPoint._parseColor(json['line']['color'])
               : json['marker']?['color'] != null
-                  ? ChartDataPoint._parseColor(json['marker']['color'])
-                  : null,
-      showPoints: json['showPoints'] ??
-          (json['mode']?.toString().contains('markers') ?? null),
-      smoothLine: json['smoothLine'] ??
+              ? ChartDataPoint._parseColor(json['marker']['color'])
+              : null,
+      showPoints:
+          json['showPoints'] ?? json['mode']?.toString().contains('markers'),
+      smoothLine:
+          json['smoothLine'] ??
           (json['line']?['shape'] == 'spline') ??
-          (json['type'] == 'smooth') ??
-          null,
-      lineWidth: json['lineWidth']?.toDouble() ??
-          json['line']?['width']?.toDouble(),
-      pointSize: json['pointSize']?.toDouble() ??
-          json['marker']?['size']?.toDouble(),
+          (json['type'] == 'smooth'),
+      lineWidth:
+          json['lineWidth']?.toDouble() ?? json['line']?['width']?.toDouble(),
+      pointSize:
+          json['pointSize']?.toDouble() ?? json['marker']?['size']?.toDouble(),
     );
   }
 
@@ -335,7 +347,7 @@ class MultiLineChartStyle {
   final CrosshairConfig? crosshair; // Configuration for the crosshair.
   final bool forceYAxisFromZero; // Flag to enforce Y-axis to start from zero.
   final MultiLineTooltipStyle
-      tooltipStyle; // Styling configuration for tooltips.
+  tooltipStyle; // Styling configuration for tooltips.
 
   /// Creates a [MultiLineChartStyle] instance with default values.
   ///
@@ -371,44 +383,52 @@ class MultiLineChartStyle {
     // Parse colors from various formats
     List<Color> colors = [];
     if (json['colors'] is List) {
-      colors = (json['colors'] as List)
-          .map((color) => ChartDataPoint._parseColor(color))
-          .toList();
+      colors =
+          (json['colors'] as List)
+              .map((color) => ChartDataPoint._parseColor(color))
+              .toList();
     } else if (json['colorway'] is List) {
       // Plotly format
-      colors = (json['colorway'] as List)
-          .map((color) => ChartDataPoint._parseColor(color))
-          .toList();
+      colors =
+          (json['colorway'] as List)
+              .map((color) => ChartDataPoint._parseColor(color))
+              .toList();
     }
-    
+
     if (colors.isEmpty) {
-      colors = [Colors.blue, Colors.red, Colors.green, Colors.orange, Colors.purple];
+      colors = [
+        Colors.blue,
+        Colors.red,
+        Colors.green,
+        Colors.orange,
+        Colors.purple,
+      ];
     }
 
     return MultiLineChartStyle(
       colors: colors,
-      defaultLineWidth: (json['defaultLineWidth'] ??
-              json['line']?['width'] ??
-              2.0)
-          .toDouble(),
-      defaultPointSize: (json['defaultPointSize'] ??
-              json['marker']?['size'] ??
-              4.0)
-          .toDouble(),
-      gridColor: json['gridColor'] != null
-          ? ChartDataPoint._parseColor(json['gridColor'])
-          : json['xaxis']?['gridcolor'] != null
+      defaultLineWidth:
+          (json['defaultLineWidth'] ?? json['line']?['width'] ?? 2.0)
+              .toDouble(),
+      defaultPointSize:
+          (json['defaultPointSize'] ?? json['marker']?['size'] ?? 4.0)
+              .toDouble(),
+      gridColor:
+          json['gridColor'] != null
+              ? ChartDataPoint._parseColor(json['gridColor'])
+              : json['xaxis']?['gridcolor'] != null
               ? ChartDataPoint._parseColor(json['xaxis']['gridcolor'])
               : json['yaxis']?['gridcolor'] != null
-                  ? ChartDataPoint._parseColor(json['yaxis']['gridcolor'])
-                  : Colors.grey,
-      backgroundColor: json['backgroundColor'] != null
-          ? ChartDataPoint._parseColor(json['backgroundColor'])
-          : json['plot_bgcolor'] != null
+              ? ChartDataPoint._parseColor(json['yaxis']['gridcolor'])
+              : Colors.grey,
+      backgroundColor:
+          json['backgroundColor'] != null
+              ? ChartDataPoint._parseColor(json['backgroundColor'])
+              : json['plot_bgcolor'] != null
               ? ChartDataPoint._parseColor(json['plot_bgcolor'])
               : json['paper_bgcolor'] != null
-                  ? ChartDataPoint._parseColor(json['paper_bgcolor'])
-                  : Colors.white,
+              ? ChartDataPoint._parseColor(json['paper_bgcolor'])
+              : Colors.white,
       labelStyle: _parseTextStyle(
         json['labelStyle'] ??
             json['xaxis']?['tickfont'] ??
@@ -417,31 +437,31 @@ class MultiLineChartStyle {
       legendStyle: _parseTextStyle(
         json['legendStyle'] ?? json['legend']?['font'],
       ),
-      smoothLines: json['smoothLines'] ??
-          json['line']?['shape'] == 'spline' ??
-          false,
+      smoothLines:
+          json['smoothLines'] ?? json['line']?['shape'] == 'spline' ?? false,
       padding: _parsePadding(json['padding'] ?? json['margin']),
       showPoints: json['showPoints'] ?? true,
-      showGrid: json['showGrid'] ??
+      showGrid:
+          json['showGrid'] ??
           json['showgrid'] ??
           json['xaxis']?['showgrid'] ??
           json['yaxis']?['showgrid'] ??
           true,
-      showLegend: json['showLegend'] ??
-          json['showlegend'] ??
-          true,
+      showLegend: json['showLegend'] ?? json['showlegend'] ?? true,
       gridLineWidth: (json['gridLineWidth'] ?? 1.0).toDouble(),
-      horizontalGridLines: (json['horizontalGridLines'] ??
-              json['yaxis']?['nticks'] ??
-              5)
-          .toInt(),
+      horizontalGridLines:
+          (json['horizontalGridLines'] ?? json['yaxis']?['nticks'] ?? 5)
+              .toInt(),
       animation: ChartAnimation.fromJson(json['animation'] ?? {}),
       legendPosition: _parseLegendPosition(
-          json['legendPosition'] ?? json['legend']?['orientation']),
-      crosshair: json['crosshair'] != null
-          ? CrosshairConfig.fromJson(json['crosshair'])
-          : null,
-      forceYAxisFromZero: json['forceYAxisFromZero'] ??
+        json['legendPosition'] ?? json['legend']?['orientation'],
+      ),
+      crosshair:
+          json['crosshair'] != null
+              ? CrosshairConfig.fromJson(json['crosshair'])
+              : null,
+      forceYAxisFromZero:
+          json['forceYAxisFromZero'] ??
           json['yaxis']?['rangemode'] == 'tozero' ??
           false,
       tooltipStyle: MultiLineTooltipStyle.fromJson(
@@ -460,9 +480,10 @@ class MultiLineChartStyle {
         fontWeight: MultiLineTooltipStyle._parseFontWeight(
           textStyle['weight'] ?? textStyle['fontWeight'],
         ),
-        color: textStyle['color'] != null
-            ? ChartDataPoint._parseColor(textStyle['color'])
-            : null,
+        color:
+            textStyle['color'] != null
+                ? ChartDataPoint._parseColor(textStyle['color'])
+                : null,
       );
     }
 
@@ -597,9 +618,7 @@ class ChartAnimation {
   /// Creates a [ChartAnimation] instance from a JSON map.
   factory ChartAnimation.fromJson(Map<String, dynamic> json) {
     return ChartAnimation(
-      duration: Duration(
-        milliseconds: (json['duration'] ?? 1000).toInt(),
-      ),
+      duration: Duration(milliseconds: (json['duration'] ?? 1000).toInt()),
       curve: _parseCurve(json['curve'] ?? 'easeInOut'),
       enabled: json['enabled'] ?? true,
     );
@@ -651,9 +670,10 @@ class CrosshairConfig {
   /// Creates a [CrosshairConfig] instance from a JSON map.
   factory CrosshairConfig.fromJson(Map<String, dynamic> json) {
     return CrosshairConfig(
-      lineColor: json['lineColor'] != null
-          ? ChartDataPoint._parseColor(json['lineColor'])
-          : Colors.grey,
+      lineColor:
+          json['lineColor'] != null
+              ? ChartDataPoint._parseColor(json['lineColor'])
+              : Colors.grey,
       lineWidth: (json['lineWidth'] ?? 1.0).toDouble(),
       enabled: json['enabled'] ?? true,
       showLabel: json['showLabel'] ?? true,
@@ -704,7 +724,7 @@ class MultiLineChartJsonConfig {
     // Handle data parsing
     if (json['data'] is List) {
       final data = json['data'] as List;
-      
+
       // Parse each series from the data array
       for (var seriesData in data) {
         if (seriesData is Map<String, dynamic>) {

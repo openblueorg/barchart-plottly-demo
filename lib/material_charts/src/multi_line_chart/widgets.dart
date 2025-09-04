@@ -12,14 +12,14 @@ import 'painter.dart';
 /// configuration.
 class MultiLineChart extends StatefulWidget {
   final List<ChartSeries>
-      series; // The data series to be displayed in the chart.
+  series; // The data series to be displayed in the chart.
   final MultiLineChartStyle style; // The styling configuration for the chart.
   final double? height; // Optional height for the chart.
   final double? width; // Optional width for the chart.
   final ValueChanged<ChartDataPoint>?
-      onPointTap; // Callback for when a point is tapped.
+  onPointTap; // Callback for when a point is tapped.
   final ValueChanged<Offset>?
-      onChartTap; // Callback for when the chart is tapped.
+  onChartTap; // Callback for when the chart is tapped.
   final bool enableZoom; // Flag to enable zoom functionality.
   final bool enablePan; // Flag to enable panning functionality.
 
@@ -92,35 +92,46 @@ class MultiLineChart extends StatefulWidget {
     for (int i = 0; i < seriesData.length && i < seriesNames.length; i++) {
       final dataPoints = <ChartDataPoint>[];
       final values = seriesData[i];
-      
+
       for (int j = 0; j < labels.length && j < values.length; j++) {
-        dataPoints.add(ChartDataPoint(
-          value: values[j],
-          label: labels[j],
-        ));
+        dataPoints.add(ChartDataPoint(value: values[j], label: labels[j]));
       }
 
-      series.add(ChartSeries(
-        name: seriesNames[i],
-        dataPoints: dataPoints,
-        color: colors != null && i < colors.length ? colors[i] : null,
-      ));
+      series.add(
+        ChartSeries(
+          name: seriesNames[i],
+          dataPoints: dataPoints,
+          color: colors != null && i < colors.length ? colors[i] : null,
+        ),
+      );
     }
 
-    final defaultColors = colors ?? [
-      Colors.blue,
-      Colors.red,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.teal,
-      Colors.pink,
-      Colors.indigo,
-    ];
+    final defaultColors =
+        colors ??
+        [
+          Colors.blue,
+          Colors.red,
+          Colors.green,
+          Colors.orange,
+          Colors.purple,
+          Colors.teal,
+          Colors.pink,
+          Colors.indigo,
+        ];
 
-    final chartStyle = style != null 
-        ? MultiLineChartStyle.fromJson({...style, 'colors': defaultColors.map((c) => '#${c.value.toRadixString(16).padLeft(8, '0')}').toList()})
-        : MultiLineChartStyle(colors: defaultColors);
+    final chartStyle =
+        style != null
+            ? MultiLineChartStyle.fromJson({
+              ...style,
+              'colors':
+                  defaultColors
+                      .map(
+                        (c) =>
+                            '#${c.toARGB32().toRadixString(16).padLeft(8, '0')}',
+                      )
+                      .toList(),
+            })
+            : MultiLineChartStyle(colors: defaultColors);
 
     return MultiLineChart(
       series: series,
@@ -166,7 +177,7 @@ class MultiLineChartState extends State<MultiLineChart>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller; // Controller for managing animations.
   late Animation<double>
-      _animation; // Animation object for controlling the animation progress.
+  _animation; // Animation object for controlling the animation progress.
   Offset? _crosshairPosition; // Current position of the crosshair.
   double _scale = 1.0; // Current scale factor for zooming.
   Offset _panOffset = Offset.zero; // Current offset for panning.
@@ -208,34 +219,46 @@ class MultiLineChartState extends State<MultiLineChart>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = widget.width ??
+        final width =
+            widget.width ??
             constraints.maxWidth; // Determine the width of the chart.
-        final height = widget.height ??
+        final height =
+            widget.height ??
             constraints.maxHeight; // Determine the height of the chart.
         _containerSize = Size(width, height); // Set the container size.
 
         return MouseRegion(
-          onEnter: (_) => setState(() => _crosshairPosition =
-              null), // Hide the crosshair when the mouse enters.
-          onExit: (_) => setState(() => _crosshairPosition =
-              null), // Hide the crosshair when the mouse exits.
+          onEnter:
+              (_) => setState(
+                () => _crosshairPosition = null,
+              ), // Hide the crosshair when the mouse enters.
+          onExit:
+              (_) => setState(
+                () => _crosshairPosition = null,
+              ), // Hide the crosshair when the mouse exits.
           onHover: (PointerHoverEvent event) {
             setState(() {
-              _crosshairPosition = event
-                  .localPosition; // Update the crosshair position on hover.
+              _crosshairPosition =
+                  event
+                      .localPosition; // Update the crosshair position on hover.
             });
           },
-          child: widget.enableZoom || widget.enablePan
-              ? GestureDetector(
-                  onScaleStart:
-                      _handleScaleStart, // Handle scale start gesture.
-                  onScaleUpdate:
-                      _handleScaleUpdate, // Handle scale update gesture.
-                  child: _buildChartContent(
-                      width, height), // Build the chart content.
-                )
-              : _buildChartContent(width,
-                  height), // Just build the chart content without gestures.
+          child:
+              widget.enableZoom || widget.enablePan
+                  ? GestureDetector(
+                    onScaleStart:
+                        _handleScaleStart, // Handle scale start gesture.
+                    onScaleUpdate:
+                        _handleScaleUpdate, // Handle scale update gesture.
+                    child: _buildChartContent(
+                      width,
+                      height,
+                    ), // Build the chart content.
+                  )
+                  : _buildChartContent(
+                    width,
+                    height,
+                  ), // Just build the chart content without gestures.
         );
       },
     );
@@ -251,8 +274,10 @@ class MultiLineChartState extends State<MultiLineChart>
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: widget
-            .style.backgroundColor, // Set the background color from style.
+        color:
+            widget
+                .style
+                .backgroundColor, // Set the background color from style.
       ),
       child: AnimatedBuilder(
         animation: _animation, // Listen for animation changes.
@@ -267,8 +292,10 @@ class MultiLineChartState extends State<MultiLineChart>
               scale: _scale, // Current scale factor.
               panOffset: _panOffset, // Current pan offset.
             ),
-            size:
-                Size(width, height), // Set the size of the CustomPaint widget.
+            size: Size(
+              width,
+              height,
+            ), // Set the size of the CustomPaint widget.
           );
         },
       ),
@@ -309,8 +336,10 @@ class MultiLineChartState extends State<MultiLineChart>
     setState(() {
       if (widget.enableZoom) {
         // Update scale first, clamping it to the defined limits.
-        final newScale = (_scale * details.scale)
-            .clamp(1.0, 3.0); // Minimum scale is 1.0, maximum is 3.0.
+        final newScale = (_scale * details.scale).clamp(
+          1.0,
+          3.0,
+        ); // Minimum scale is 1.0, maximum is 3.0.
         _scale = newScale;
       }
 
