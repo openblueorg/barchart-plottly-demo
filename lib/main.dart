@@ -13,37 +13,36 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Material Charts Demo',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: const LineChartDemo(),
+      home: const MaterialChartsDemo(),
     );
   }
 }
 
-/// Enhanced line chart demo with JSON schema support
-class LineChartDemo extends StatefulWidget {
-  const LineChartDemo({super.key});
+/// Enhanced charts demo with comprehensive JSON schema support
+class MaterialChartsDemo extends StatefulWidget {
+  const MaterialChartsDemo({super.key});
 
   @override
-  State<LineChartDemo> createState() => _LineChartDemoState();
+  State<MaterialChartsDemo> createState() => _MaterialChartsDemoState();
 }
 
-class _LineChartDemoState extends State<LineChartDemo> {
-  int _currentIndex = 0;
-  
-  // Sample data for the line chart
-  final List<ChartData> _chartData = [
-    const ChartData(value: 20, label: 'Jan'),
-    const ChartData(value: 35, label: 'Feb'),
-    const ChartData(value: 28, label: 'Mar'),
-    const ChartData(value: 45, label: 'Apr'),
-    const ChartData(value: 52, label: 'May'),
-    const ChartData(value: 38, label: 'Jun'),
-    const ChartData(value: 65, label: 'Jul'),
-    const ChartData(value: 72, label: 'Aug'),
-    const ChartData(value: 58, label: 'Sep'),
-    const ChartData(value: 48, label: 'Oct'),
-    const ChartData(value: 55, label: 'Nov'),
-    const ChartData(value: 68, label: 'Dec'),
-  ];
+class _MaterialChartsDemoState extends State<MaterialChartsDemo>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  int _currentChartIndex = 0;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +51,16 @@ class _LineChartDemoState extends State<LineChartDemo> {
         title: const Text('Material Charts Demo'),
         backgroundColor: const Color(0xFF16213E),
         foregroundColor: Colors.white,
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: const Color(0xFF7B9E87),
+          labelColor: Colors.white,
+          unselectedLabelColor: const Color(0xFFB0BEC5),
+          tabs: const [
+            Tab(text: 'LineChart Examples'),
+            Tab(text: 'MultiLineChart Examples'),
+          ],
+        ),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -64,63 +73,369 @@ class _LineChartDemoState extends State<LineChartDemo> {
             ],
           ),
         ),
-        child: Column(
+        child: TabBarView(
+          controller: _tabController,
           children: [
-            // Tab buttons
-            Container(
-              margin: const EdgeInsets.all(16.0),
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-                border: Border.all(color: const Color(0xFF2C3E50), width: 1),
-              ),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildTabButton(0, 'Basic Line'),
-                    const SizedBox(width: 8),
-                    _buildTabButton(1, 'Curved Line'),
-                    const SizedBox(width: 8),
-                    _buildTabButton(2, 'Simple JSON'),
-                    const SizedBox(width: 8),
-                    _buildTabButton(3, 'Plotly JSON'),
-                    const SizedBox(width: 8),
-                    _buildTabButton(4, 'Advanced JSON'),
-                    const SizedBox(width: 8),
-                    _buildTabButton(5, 'From Data'),
-                  ],
-                ),
-              ),
-            ),
-            
-            // Chart content
-            Expanded(
-              child: Center(
-                child: _buildCurrentChart(),
-              ),
-            ),
+            _buildMultiLineChartExamples(),
           ],
         ),
       ),
     );
   }
+  // ========================================
+  // MULTI-LINE CHART EXAMPLES
+  // ========================================
+
+  Widget _buildMultiLineChartExamples() {
+    return Column(
+      children: [
+        // Multi-line chart tab buttons
+        Container(
+          margin: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: const Color(0xFF16213E),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 4),
+              ),
+            ],
+            border: Border.all(color: const Color(0xFF2C3E50), width: 1),
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildTabButton(6, 'Basic Multi'),
+                const SizedBox(width: 8),
+                _buildTabButton(7, 'Simple JSON'),
+                const SizedBox(width: 8),
+                _buildTabButton(8, 'Plotly JSON'),
+                const SizedBox(width: 8),
+                _buildTabButton(9, 'Interactive'),
+                const SizedBox(width: 8),
+                _buildTabButton(10, 'From Data'),
+              ],
+            ),
+          ),
+        ),
+        
+        // Multi-line chart content
+        Expanded(
+          child: Center(
+            child: _buildCurrentMultiLineChart(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCurrentMultiLineChart() {
+    switch (_currentChartIndex) {
+      case 6:
+        return _buildBasicMultiLineChart();
+      case 7:
+        return _buildSimpleJsonMultiLineChart();
+      case 8:
+        return _buildPlotlyJsonMultiLineChart();
+      case 9:
+        return _buildInteractiveMultiLineChart();
+      case 10:
+        return _buildFromDataMultiLineChart();
+      default:
+        return _buildBasicMultiLineChart();
+    }
+  }
+
+  /// Basic multi-line chart
+  Widget _buildBasicMultiLineChart() {
+    final series = [
+      ChartSeries(
+        name: 'Revenue',
+        dataPoints: [
+          const ChartDataPoint(value: 120, label: 'Jan'),
+          const ChartDataPoint(value: 150, label: 'Feb'),
+          const ChartDataPoint(value: 180, label: 'Mar'),
+          const ChartDataPoint(value: 165, label: 'Apr'),
+          const ChartDataPoint(value: 200, label: 'May'),
+          const ChartDataPoint(value: 185, label: 'Jun'),
+        ],
+        color: const Color(0xFF4CAF50),
+        lineWidth: 3.0,
+        showPoints: true,
+      ),
+      ChartSeries(
+        name: 'Expenses',
+        dataPoints: [
+          const ChartDataPoint(value: 80, label: 'Jan'),
+          const ChartDataPoint(value: 95, label: 'Feb'),
+          const ChartDataPoint(value: 110, label: 'Mar'),
+          const ChartDataPoint(value: 105, label: 'Apr'),
+          const ChartDataPoint(value: 125, label: 'May'),
+          const ChartDataPoint(value: 115, label: 'Jun'),
+        ],
+        color: const Color(0xFF2196F3),
+        lineWidth: 2.5,
+        smoothLine: true,
+        showPoints: true,
+      ),
+    ];
+
+    final style = MultiLineChartStyle(
+      colors: [const Color(0xFF4CAF50), const Color(0xFF2196F3)],
+      backgroundColor: const Color(0xFF16213E),
+      gridColor: const Color(0xFF34495E),
+      showGrid: true,
+      showLegend: true,
+      legendPosition: LegendPosition.top,
+      padding: const EdgeInsets.fromLTRB(32, 60, 32, 32),
+      animation: const ChartAnimation(
+        duration: Duration(milliseconds: 2000),
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    return _buildChartContainer(
+      title: 'Basic MultiLineChart',
+      subtitle: 'Multiple series with traditional constructor',
+      child: MultiLineChart(
+        series: series,
+        style: style,
+        width: 750,
+        height: 350,
+      ),
+    );
+  }
+
+  /// Simple JSON multi-line chart
+  Widget _buildSimpleJsonMultiLineChart() {
+    final multiLineJson = {
+      "series": [
+        {
+          "name": "Product A",
+          "dataPoints": [
+            {"label": "Q1", "value": 120},
+            {"label": "Q2", "value": 150},
+            {"label": "Q3", "value": 180},
+            {"label": "Q4", "value": 165}
+          ],
+          "color": "#E74C3C",
+          "lineWidth": 3,
+          "showPoints": true
+        },
+        {
+          "name": "Product B",
+          "dataPoints": [
+            {"label": "Q1", "value": 80},
+            {"label": "Q2", "value": 95},
+            {"label": "Q3", "value": 110},
+            {"label": "Q4", "value": 125}
+          ],
+          "color": "#3498DB",
+          "smoothLine": true,
+          "lineWidth": 2.5,
+          "showPoints": true
+        },
+        {
+          "name": "Product C",
+          "dataPoints": [
+            {"label": "Q1", "value": 100},
+            {"label": "Q2", "value": 115},
+            {"label": "Q3", "value": 130},
+            {"label": "Q4", "value": 140}
+          ],
+          "color": "#2ECC71",
+          "lineWidth": 2,
+          "showPoints": true
+        }
+      ],
+      "style": {
+        "backgroundColor": "#16213E",
+        "gridColor": "#34495E",
+        "showGrid": true,
+        "showLegend": true,
+        "legendPosition": "top",
+        "padding": {"top": 60, "right": 32, "bottom": 32, "left": 32},
+        "animation": {
+          "duration": 2200,
+          "curve": "easeInOut"
+        }
+      },
+      "width": 750,
+      "height": 350
+    };
+
+    return _buildChartContainer(
+      title: 'MultiLineChart Simple JSON',
+      subtitle: 'Multiple series with simple JSON format',
+      child: MultiLineChart.fromJson(multiLineJson),
+    );
+  }
+
+  /// Plotly JSON multi-line chart
+  Widget _buildPlotlyJsonMultiLineChart() {
+    const plotlyMultiJson = '''
+    {
+      "data": [
+        {
+          "x": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+          "y": [85, 92, 78, 95, 88],
+          "name": "Team Alpha",
+          "type": "scatter",
+          "mode": "lines+markers",
+          "line": {"color": "#9B59B6", "width": 3},
+          "marker": {"size": 8}
+        },
+        {
+          "x": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+          "y": [70, 85, 90, 87, 92],
+          "name": "Team Beta",
+          "type": "scatter",
+          "mode": "lines+markers",
+          "line": {"color": "#E67E22", "width": 2, "shape": "spline"},
+          "marker": {"size": 6}
+        },
+        {
+          "x": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+          "y": [60, 75, 82, 79, 85],
+          "name": "Team Gamma",
+          "type": "scatter",
+          "mode": "lines",
+          "line": {"color": "#1ABC9C", "width": 3, "shape": "spline"}
+        }
+      ],
+      "layout": {
+        "width": 750,
+        "height": 350,
+        "plot_bgcolor": "#16213E",
+        "paper_bgcolor": "#16213E",
+        "showlegend": true,
+        "legend": {"orientation": "top"},
+        "xaxis": {
+          "showgrid": true,
+          "gridcolor": "#34495E"
+        },
+        "yaxis": {
+          "showgrid": true,
+          "gridcolor": "#34495E"
+        },
+        "margin": {
+          "l": 32,
+          "r": 32,
+          "t": 60,
+          "b": 32
+        }
+      }
+    }
+    ''';
+
+    return _buildChartContainer(
+      title: 'MultiLineChart Plotly JSON',
+      subtitle: 'Standard Plotly format with multiple traces',
+      child: MultiLineChart.fromJsonString(plotlyMultiJson),
+    );
+  }
+
+  /// Interactive multi-line chart with zoom and pan
+  Widget _buildInteractiveMultiLineChart() {
+    final interactiveData = {
+      "data": [
+        {
+          "x": List.generate(20, (i) => "Day ${i + 1}"),
+          "y": List.generate(20, (i) => 50 + (i * 0.8) + (i % 7) * 5),
+          "name": "Stock A",
+          "line": {"color": "#E74C3C", "width": 2}
+        },
+        {
+          "x": List.generate(20, (i) => "Day ${i + 1}"),
+          "y": List.generate(20, (i) => 45 + (i * 0.6) + (i % 5) * 4),
+          "name": "Stock B",
+          "line": {"color": "#3498DB", "width": 2, "shape": "spline"}
+        },
+        {
+          "x": List.generate(20, (i) => "Day ${i + 1}"),
+          "y": List.generate(20, (i) => 40 + (i * 0.7) + (i % 6) * 3),
+          "name": "Stock C",
+          "line": {"color": "#2ECC71", "width": 2}
+        }
+      ],
+      "layout": {
+        "width": 750,
+        "height": 350,
+        "plot_bgcolor": "#16213E",
+        "showlegend": true,
+        "crosshair": {
+          "enabled": true,
+          "lineColor": "#7F8C8D",
+          "showLabel": true
+        },
+        "hoverlabel": {
+          "bgcolor": "#34495E",
+          "font": {"color": "#ECF0F1"}
+        }
+      },
+      "enableZoom": true,
+      "enablePan": true
+    };
+
+    return _buildChartContainer(
+      title: 'Interactive MultiLineChart',
+      subtitle: 'Zoom, pan, and crosshair functionality (try pinch/scroll to zoom)',
+      child: MultiLineChart.fromJson(interactiveData),
+    );
+  }
+
+  /// From data arrays multi-line chart
+  Widget _buildFromDataMultiLineChart() {
+    return _buildChartContainer(
+      title: 'MultiLineChart From Data',
+      subtitle: 'Created from simple data arrays',
+      child: MultiLineChart.fromData(
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        seriesData: [
+          [20, 30, 25, 35, 40, 38], // Series 1
+          [15, 25, 30, 28, 35, 33], // Series 2
+          [10, 20, 15, 25, 30, 28], // Series 3
+        ],
+        seriesNames: ['Revenue', 'Costs', 'Profit'],
+        colors: [
+          const Color(0xFF4CAF50),
+          const Color(0xFFFF9800),
+          const Color(0xFF2196F3)
+        ],
+        width: 750,
+        height: 350,
+        style: {
+          'backgroundColor': '#16213E',
+          'gridColor': '#34495E',
+          'showGrid': true,
+          'showLegend': true,
+          'legendPosition': 'top',
+          'padding': {'top': 60, 'right': 32, 'bottom': 32, 'left': 32},
+          'animation': {
+            'duration': 2500,
+            'curve': 'easeInOut'
+          }
+        },
+      ),
+    );
+  }
+
+ 
+  // ========================================
+  // HELPER WIDGETS
+  // ========================================
 
   Widget _buildTabButton(int index, String label) {
-    final isSelected = _currentIndex == index;
+    final isSelected = _currentChartIndex == index;
     return ElevatedButton(
       onPressed: () {
         setState(() {
-          _currentIndex = index;
+          _currentChartIndex = index;
         });
       },
       style: ElevatedButton.styleFrom(
@@ -143,290 +458,6 @@ class _LineChartDemoState extends State<LineChartDemo> {
           fontSize: 13,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
         ),
-      ),
-    );
-  }
-
-  Widget _buildCurrentChart() {
-    switch (_currentIndex) {
-      case 0:
-        return _buildBasicLineChart();
-      case 1:
-        return _buildCurvedLineChart();
-      case 2:
-        return _buildSimpleJsonChart();
-      case 3:
-        return _buildPlotlyJsonChart();
-      case 4:
-        return _buildAdvancedJsonChart();
-      case 5:
-        return _buildFromDataChart();
-      default:
-        return _buildBasicLineChart();
-    }
-  }
-
-  /// Basic line chart with simple styling
-  Widget _buildBasicLineChart() {
-    return _buildChartContainer(
-      title: 'Basic Line Chart',
-      subtitle: 'Traditional constructor approach',
-      child: MaterialChartLine(
-        data: _chartData,
-        width: 750,
-        height: 350,
-        style: const LineChartStyle(
-          lineColor: Color(0xFF4CAF50),
-          pointColor: Color(0xFF4CAF50),
-          backgroundColor: Color(0xFF16213E),
-          gridColor: Color(0xFF34495E),
-          strokeWidth: 3.0,
-          pointRadius: 5.0,
-          animationDuration: Duration(milliseconds: 2000),
-          animationCurve: Curves.easeInOut,
-        ),
-        showPoints: true,
-        showGrid: true,
-        showTooltips: true,
-        padding: const EdgeInsets.all(32),
-        horizontalGridLines: 6,
-        onAnimationComplete: () {
-          print('Basic line chart animation completed!');
-        },
-      ),
-    );
-  }
-
-  /// Curved line chart with smooth curves
-  Widget _buildCurvedLineChart() {
-    return _buildChartContainer(
-      title: 'Curved Line Chart',
-      subtitle: 'Smooth spline interpolation',
-      child: MaterialChartLine(
-        data: _chartData,
-        width: 750,
-        height: 350,
-        style: const LineChartStyle(
-          lineColor: Color(0xFF2196F3),
-          pointColor: Color(0xFF2196F3),
-          backgroundColor: Color(0xFF16213E),
-          gridColor: Color(0xFF34495E),
-          strokeWidth: 3.0,
-          pointRadius: 5.0,
-          useCurvedLines: true,
-          curveIntensity: 0.5,
-          animationDuration: Duration(milliseconds: 2500),
-          animationCurve: Curves.easeInOut,
-        ),
-        showPoints: true,
-        showGrid: true,
-        showTooltips: true,
-        padding: const EdgeInsets.all(32),
-        horizontalGridLines: 6,
-        onAnimationComplete: () {
-          print('Curved line chart animation completed!');
-        },
-      ),
-    );
-  }
-
-  /// Simple JSON format example
-  Widget _buildSimpleJsonChart() {
-    final jsonData = {
-      "data": [
-        {"x": "Q1", "y": 25},
-        {"x": "Q2", "y": 42},
-        {"x": "Q3", "y": 35},
-        {"x": "Q4", "y": 58},
-        {"x": "Q5", "y": 48},
-        {"x": "Q6", "y": 65}
-      ],
-      "style": {
-        "lineColor": "#FF9800",
-        "pointColor": "#FF9800",
-        "backgroundColor": "#16213E",
-        "gridColor": "#34495E",
-        "strokeWidth": 4.0,
-        "pointRadius": 6.0,
-        "useCurvedLines": true,
-        "curveIntensity": 0.4,
-        "animationDuration": 2000,
-        "showTooltips": true,
-      },
-      "width": 750.0,
-      "height": 350.0,
-      "padding": {
-        "left": 32,
-        "top": 32,
-        "right": 32,
-        "bottom": 32
-      },
-      "showPoints": true,
-      "showGrid": true,
-      "horizontalGridLines": 6
-    };
-
-    return _buildChartContainer(
-      title: 'Simple JSON Format',
-      subtitle: 'Lightweight JSON schema for quick setup',
-      child: MaterialChartLine.fromJson(jsonData),
-    );
-  }
-
-  /// Plotly-compatible JSON format
-  Widget _buildPlotlyJsonChart() {
-    const plotlyJson = '''
-    {
-      "data": [{
-        "x": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6"],
-        "y": [30, 45, 38, 52, 48, 62],
-        "type": "scatter",
-        "mode": "lines+markers",
-        "line": {
-          "color": "#E91E63",
-          "width": 3,
-          "shape": "spline",
-          "smoothing": 0.6
-        },
-        "marker": {
-          "color": "#E91E63",
-          "size": 7
-        }
-      }],
-      "layout": {
-        "width": 750,
-        "height": 350,
-        "plot_bgcolor": "#16213E",
-        "showgrid": true,
-        "animation": {
-          "duration": 2200,
-          "curve": "easeInOut"
-        },
-        "xaxis": {
-          "gridcolor": "#34495E",
-          "showgrid": true
-        },
-        "yaxis": {
-          "gridcolor": "#34495E",
-          "showgrid": true
-        },
-        "hoverlabel": {
-          "bgcolor": "#FFFFFF",
-          "bordercolor": "#E91E63",
-          "font": {
-            "size": 12,
-            "color": "#424242"
-          }
-        },
-        "margin": {
-          "l": 32,
-          "r": 32,
-          "t": 32,
-          "b": 32
-        }
-      }
-    }
-    ''';
-
-    return _buildChartContainer(
-      title: 'Plotly JSON Format',
-      subtitle: 'Full Plotly.js compatibility with layout configuration',
-      child: MaterialChartLine.fromJsonString(plotlyJson),
-    );
-  }
-
-  /// Advanced JSON with comprehensive styling
-  Widget _buildAdvancedJsonChart() {
-    const advancedJson = '''
-    {
-      "data": [{
-        "x": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
-        "y": [15, 28, 22, 35, 42, 38, 48, 55],
-        "type": "scatter",
-        "mode": "lines+markers",
-        "line": {
-          "color": "#9C27B0",
-          "width": 4,
-          "shape": "spline",
-          "smoothing": 0.7
-        },
-        "marker": {
-          "color": "#9C27B0",
-          "size": 8
-        }
-      }],
-      "layout": {
-        "width": 750,
-        "height": 350,
-        "plot_bgcolor": "#16213E",
-        "paper_bgcolor": "#16213E",
-        "xaxis": {
-          "gridcolor": "#34495E",
-          "showgrid": true,
-          "tickfont": {
-            "size": 12,
-            "color": "#E8F4F8"
-          }
-        },
-        "yaxis": {
-          "gridcolor": "#34495E",
-          "showgrid": true
-        },
-        "hoverlabel": {
-          "bgcolor": "#FFFFFF",
-          "bordercolor": "#9C27B0",
-          "font": {
-            "size": 14,
-            "color": "#7B1FA2"
-          }
-        },
-        "margin": {
-          "l": 32,
-          "r": 32,
-          "t": 32,
-          "b": 32
-        }
-      }
-    }
-    ''';
-
-    return _buildChartContainer(
-      title: 'Advanced JSON Styling',
-      subtitle: 'Complex styling with custom animations and tooltips',
-      child: MaterialChartLine.fromJsonString(advancedJson),
-    );
-  }
-
-  /// From data array constructor
-  Widget _buildFromDataChart() {
-    return _buildChartContainer(
-      title: 'From Data Arrays',
-      subtitle: 'Programmatic chart creation with style map',
-      child: MaterialChartLine.fromData(
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        values: [22, 35, 28, 45, 38, 52, 48],
-        style: {
-          'lineColor': '#00BCD4',
-          'pointColor': '#00BCD4',
-          'backgroundColor': '#16213E',
-          'gridColor': '#34495E',
-          'strokeWidth': 3.5,
-          'pointRadius': 6.0,
-          'useCurvedLines': true,
-          'curveIntensity': 0.5,
-          'animationDuration': 2400,
-          'animationCurve': 'easeInOut',
-          'showTooltips': true,
-        },
-        width: 750,
-        height: 350,
-        showPoints: true,
-        showGrid: true,
-        padding: const EdgeInsets.all(32),
-        horizontalGridLines: 6,
-        onAnimationComplete: () {
-          print('From data chart animation completed!');
-        },
       ),
     );
   }
