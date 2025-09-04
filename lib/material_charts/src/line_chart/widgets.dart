@@ -55,6 +55,79 @@ class MaterialChartLine extends StatefulWidget {
     this.onAnimationComplete,
   });
 
+  /// Creates a [MaterialChartLine] from JSON configuration.
+  /// Supports both simple and Plotly-compatible formats.
+  factory MaterialChartLine.fromJson(Map<String, dynamic> json) {
+    final config = LineChartJsonConfig.fromJson(json);
+    return MaterialChartLine(
+      data: config.getChartData(),
+      width: config.width,
+      height: config.height,
+      style: config.getLineChartStyle(),
+      showGrid: config.showGrid,
+      showPoints: config.showPoints,
+      showTooltips: config.showTooltips,
+      padding: config.padding,
+      horizontalGridLines: config.horizontalGridLines,
+      onAnimationComplete: config.onAnimationComplete,
+    );
+  }
+
+  /// Creates a [MaterialChartLine] from a JSON string.
+  factory MaterialChartLine.fromJsonString(String jsonString) {
+    final config = LineChartJsonConfig.fromJsonString(jsonString);
+    return MaterialChartLine(
+      data: config.getChartData(),
+      width: config.width,
+      height: config.height,
+      style: config.getLineChartStyle(),
+      showGrid: config.showGrid,
+      showPoints: config.showPoints,
+      showTooltips: config.showTooltips,
+      padding: config.padding,
+      horizontalGridLines: config.horizontalGridLines,
+      onAnimationComplete: config.onAnimationComplete,
+    );
+  }
+
+  /// Creates a [MaterialChartLine] from simple data arrays.
+  /// This is a convenience constructor for quick chart creation.
+  factory MaterialChartLine.fromData({
+    required List<String> labels,
+    required List<double> values,
+    Map<String, dynamic>? style,
+    double width = 800,
+    double height = 400,
+    bool showGrid = true,
+    bool showPoints = true,
+    bool showTooltips = true,
+    EdgeInsets padding = const EdgeInsets.all(24),
+    int horizontalGridLines = 5,
+    VoidCallback? onAnimationComplete,
+  }) {
+    final data = <ChartData>[];
+
+    for (int i = 0; i < labels.length && i < values.length; i++) {
+      data.add(ChartData(value: values[i], label: labels[i]));
+    }
+
+    final chartStyle =
+        style != null ? LineChartStyle.fromJson(style) : const LineChartStyle();
+
+    return MaterialChartLine(
+      data: data,
+      width: width,
+      height: height,
+      style: chartStyle,
+      showGrid: showGrid,
+      showPoints: showPoints,
+      showTooltips: showTooltips,
+      padding: padding,
+      horizontalGridLines: horizontalGridLines,
+      onAnimationComplete: onAnimationComplete,
+    );
+  }
+
   @override
   State<MaterialChartLine> createState() => _MaterialChartLineState();
 }
@@ -87,11 +160,11 @@ class _MaterialChartLineState extends State<MaterialChartLine>
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: widget.style.animationCurve),
     )..addStatusListener((status) {
-        // Trigger the completion callback when the animation ends.
-        if (status == AnimationStatus.completed) {
-          widget.onAnimationComplete?.call();
-        }
-      });
+      // Trigger the completion callback when the animation ends.
+      if (status == AnimationStatus.completed) {
+        widget.onAnimationComplete?.call();
+      }
+    });
 
     // Start the animation forward.
     _controller.forward();
@@ -107,20 +180,22 @@ class _MaterialChartLineState extends State<MaterialChartLine>
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) =>
-          setState(() => _hoverPosition = null), // Reset hover on enter
+      onEnter:
+          (_) => setState(() => _hoverPosition = null), // Reset hover on enter
       onHover: (details) {
         setState(() {
           _hoverPosition = details.localPosition; // Update hover position
         });
       },
-      onExit: (_) =>
-          setState(() => _hoverPosition = null), // Clear hover on exit
+      onExit:
+          (_) => setState(() => _hoverPosition = null), // Clear hover on exit
       child: Container(
         width: widget.width,
         height: widget.height,
-        color: widget
-            .style.backgroundColor, // Set the background color for the chart.
+        color:
+            widget
+                .style
+                .backgroundColor, // Set the background color for the chart.
         child: AnimatedBuilder(
           animation: _animation, // Rebuilds when the animation changes.
           builder: (context, _) {
@@ -129,13 +204,15 @@ class _MaterialChartLineState extends State<MaterialChartLine>
               painter: LineChartPainter(
                 data: widget.data, // Pass the data points for the chart.
                 progress: _animation.value, // Use the current animation value.
-                style: widget.showTooltips
-                    ? widget.style
-                    : widget.style.copyWith(
-                        showTooltips: false,
-                      ), // Override tooltip visibility
-                showPoints: widget
-                    .showPoints, // Indicates if data points should be shown.
+                style:
+                    widget.showTooltips
+                        ? widget.style
+                        : widget.style.copyWith(
+                          showTooltips: false,
+                        ), // Override tooltip visibility
+                showPoints:
+                    widget
+                        .showPoints, // Indicates if data points should be shown.
                 showGrid:
                     widget.showGrid, // Indicates if grid lines should be shown.
                 padding: widget.padding, // Apply padding around the chart.
