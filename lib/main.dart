@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// Enhanced charts demo with comprehensive JSON schema support
+/// Enhanced charts demo with pie chart examples
 class MaterialChartsDemo extends StatefulWidget {
   const MaterialChartsDemo({super.key});
 
@@ -31,11 +31,10 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
   late TabController _tabController;
   int _currentChartIndex = 0;
 
-
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 1, vsync: this);
   }
 
   @override
@@ -48,7 +47,7 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Material Charts Demo'),
+        title: const Text('Material Pie Charts Demo'),
         backgroundColor: const Color(0xFF16213E),
         foregroundColor: Colors.white,
         bottom: TabBar(
@@ -57,8 +56,7 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
           labelColor: Colors.white,
           unselectedLabelColor: const Color(0xFFB0BEC5),
           tabs: const [
-            Tab(text: 'LineChart Examples'),
-            Tab(text: 'MultiLineChart Examples'),
+            Tab(text: 'PieChart Examples'),
           ],
         ),
       ),
@@ -76,20 +74,21 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
         child: TabBarView(
           controller: _tabController,
           children: [
-            _buildMultiLineChartExamples(),
+            _buildPieChartExamples(),
           ],
         ),
       ),
     );
   }
+
   // ========================================
-  // MULTI-LINE CHART EXAMPLES
+  // PIE CHART EXAMPLES
   // ========================================
 
-  Widget _buildMultiLineChartExamples() {
+  Widget _buildPieChartExamples() {
     return Column(
       children: [
-        // Multi-line chart tab buttons
+        // Pie chart tab buttons
         Container(
           margin: const EdgeInsets.all(16.0),
           padding: const EdgeInsets.all(8.0),
@@ -110,322 +109,246 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildTabButton(6, 'Basic Multi'),
+                _buildTabButton(0, 'Basic Pie'),
                 const SizedBox(width: 8),
-                _buildTabButton(7, 'Simple JSON'),
+                _buildTabButton(1, 'Doughnut'),
                 const SizedBox(width: 8),
-                _buildTabButton(8, 'Plotly JSON'),
+                _buildTabButton(2, 'Interactive'),
                 const SizedBox(width: 8),
-                _buildTabButton(9, 'Interactive'),
+                _buildTabButton(3, 'Custom Colors'),
                 const SizedBox(width: 8),
-                _buildTabButton(10, 'From Data'),
+                _buildTabButton(4, 'Sales Data'),
               ],
             ),
           ),
         ),
         
-        // Multi-line chart content
+        // Pie chart content
         Expanded(
           child: Center(
-            child: _buildCurrentMultiLineChart(),
+            child: _buildCurrentPieChart(),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildCurrentMultiLineChart() {
+  Widget _buildCurrentPieChart() {
     switch (_currentChartIndex) {
-      case 6:
-        return _buildBasicMultiLineChart();
-      case 7:
-        return _buildSimpleJsonMultiLineChart();
-      case 8:
-        return _buildPlotlyJsonMultiLineChart();
-      case 9:
-        return _buildInteractiveMultiLineChart();
-      case 10:
-        return _buildFromDataMultiLineChart();
+      case 0:
+        return _buildBasicPieChart();
+      case 1:
+        return _buildDoughnutChart();
+      case 2:
+        return _buildInteractivePieChart();
+      case 3:
+        return _buildCustomColorsPieChart();
+      case 4:
+        return _buildSalesDataPieChart();
       default:
-        return _buildBasicMultiLineChart();
+        return _buildBasicPieChart();
     }
   }
 
-  /// Basic multi-line chart
-  Widget _buildBasicMultiLineChart() {
-    final series = [
-      ChartSeries(
-        name: 'Revenue',
-        dataPoints: [
-          const ChartDataPoint(value: 120, label: 'Jan'),
-          const ChartDataPoint(value: 150, label: 'Feb'),
-          const ChartDataPoint(value: 180, label: 'Mar'),
-          const ChartDataPoint(value: 165, label: 'Apr'),
-          const ChartDataPoint(value: 200, label: 'May'),
-          const ChartDataPoint(value: 185, label: 'Jun'),
-        ],
-        color: const Color(0xFF4CAF50),
-        lineWidth: 3.0,
-        showPoints: true,
+  /// Basic pie chart
+  Widget _buildBasicPieChart() {
+    final data = [
+      const PieChartData(value: 35, label: 'Desktop', color: Color(0xFF4CAF50)),
+      const PieChartData(value: 25, label: 'Mobile', color: Color(0xFF2196F3)),
+      const PieChartData(value: 20, label: 'Tablet', color: Color(0xFFFF9800)),
+      const PieChartData(value: 15, label: 'Other', color: Color(0xFF9C27B0)),
+      const PieChartData(value: 5, label: 'TV', color: Color(0xFFF44336)),
+    ];
+
+    final style = const PieChartStyle(
+      backgroundColor: Color(0xFF16213E),
+      showLabels: true,
+      showValues: true,
+      showLegend: true,
+      legendPosition: PieChartLegendPosition.right,
+      labelPosition: LabelPosition.outside,
+      animationDuration: Duration(milliseconds: 2000),
+      animationCurve: Curves.easeInOut,
+    );
+
+    return _buildChartContainer(
+      title: 'Basic Pie Chart',
+      subtitle: 'Simple pie chart with default styling',
+      child: MaterialPieChart(
+        data: data,
+        width: 600,
+        height: 400,
+        style: style,
       ),
-      ChartSeries(
-        name: 'Expenses',
-        dataPoints: [
-          const ChartDataPoint(value: 80, label: 'Jan'),
-          const ChartDataPoint(value: 95, label: 'Feb'),
-          const ChartDataPoint(value: 110, label: 'Mar'),
-          const ChartDataPoint(value: 105, label: 'Apr'),
-          const ChartDataPoint(value: 125, label: 'May'),
-          const ChartDataPoint(value: 115, label: 'Jun'),
-        ],
-        color: const Color(0xFF2196F3),
-        lineWidth: 2.5,
-        smoothLine: true,
-        showPoints: true,
+    );
+  }
+
+  /// Doughnut chart
+  Widget _buildDoughnutChart() {
+    final data = [
+      const PieChartData(value: 40, label: 'Revenue', color: Color(0xFF2ECC71)),
+      const PieChartData(value: 30, label: 'Costs', color: Color(0xFFE74C3C)),
+      const PieChartData(value: 20, label: 'Marketing', color: Color(0xFF3498DB)),
+      const PieChartData(value: 10, label: 'R&D', color: Color(0xFFF39C12)),
+    ];
+
+    final style = const PieChartStyle(
+      backgroundColor: Color(0xFF16213E),
+      holeRadius: 0.4, // Creates doughnut effect
+      showLabels: true,
+      showValues: true,
+      showLegend: true,
+      legendPosition: PieChartLegendPosition.bottom,
+      labelPosition: LabelPosition.outside,
+      animationDuration: Duration(milliseconds: 2500),
+      animationCurve: Curves.easeInOut,
+    );
+
+    return _buildChartContainer(
+      title: 'Doughnut Chart',
+      subtitle: 'Pie chart with center hole for doughnut effect',
+      child: MaterialPieChart(
+        data: data,
+        width: 600,
+        height: 400,
+        style: style,
+      ),
+    );
+  }
+
+  /// Interactive pie chart
+  Widget _buildInteractivePieChart() {
+    final data = [
+      PieChartData(
+        value: 45,
+        label: 'North America',
+        color: const Color(0xFF8E44AD),
+        onTap: () => _showSnackBar('North America: 45%'),
+      ),
+      PieChartData(
+        value: 25,
+        label: 'Europe',
+        color: const Color(0xFF1ABC9C),
+        onTap: () => _showSnackBar('Europe: 25%'),
+      ),
+      PieChartData(
+        value: 20,
+        label: 'Asia',
+        color: const Color(0xFFE67E22),
+        onTap: () => _showSnackBar('Asia: 20%'),
+      ),
+      PieChartData(
+        value: 10,
+        label: 'Others',
+        color: const Color(0xFF95A5A6),
+        onTap: () => _showSnackBar('Others: 10%'),
       ),
     ];
 
-    final style = MultiLineChartStyle(
-      colors: [const Color(0xFF4CAF50), const Color(0xFF2196F3)],
-      backgroundColor: const Color(0xFF16213E),
-      gridColor: const Color(0xFF34495E),
-      showGrid: true,
+    final style = const PieChartStyle(
+      backgroundColor: Color(0xFF16213E),
+      showLabels: true,
+      showValues: true,
       showLegend: true,
-      legendPosition: LegendPosition.top,
-      padding: const EdgeInsets.fromLTRB(32, 60, 32, 32),
-      animation: const ChartAnimation(
-        duration: Duration(milliseconds: 2000),
-        curve: Curves.easeInOut,
-      ),
+      legendPosition: PieChartLegendPosition.right,
+      labelPosition: LabelPosition.outside,
+      showConnectorLines: true,
+      connectorLineColor: Color(0xFF7F8C8D),
+      animationDuration: Duration(milliseconds: 3000),
+      animationCurve: Curves.elasticOut,
     );
 
     return _buildChartContainer(
-      title: 'Basic MultiLineChart',
-      subtitle: 'Multiple series with traditional constructor',
-      child: MultiLineChart(
-        series: series,
+      title: 'Interactive Pie Chart',
+      subtitle: 'Click on segments to see details',
+      child: MaterialPieChart(
+        data: data,
+        width: 600,
+        height: 400,
         style: style,
-        width: 750,
-        height: 350,
+        interactive: true,
+        onAnimationComplete: () => _showSnackBar('Animation completed!'),
       ),
     );
   }
 
-  /// Simple JSON multi-line chart
-  Widget _buildSimpleJsonMultiLineChart() {
-    final multiLineJson = {
-      "series": [
-        {
-          "name": "Product A",
-          "dataPoints": [
-            {"label": "Q1", "value": 120},
-            {"label": "Q2", "value": 150},
-            {"label": "Q3", "value": 180},
-            {"label": "Q4", "value": 165}
-          ],
-          "color": "#E74C3C",
-          "lineWidth": 3,
-          "showPoints": true
-        },
-        {
-          "name": "Product B",
-          "dataPoints": [
-            {"label": "Q1", "value": 80},
-            {"label": "Q2", "value": 95},
-            {"label": "Q3", "value": 110},
-            {"label": "Q4", "value": 125}
-          ],
-          "color": "#3498DB",
-          "smoothLine": true,
-          "lineWidth": 2.5,
-          "showPoints": true
-        },
-        {
-          "name": "Product C",
-          "dataPoints": [
-            {"label": "Q1", "value": 100},
-            {"label": "Q2", "value": 115},
-            {"label": "Q3", "value": 130},
-            {"label": "Q4", "value": 140}
-          ],
-          "color": "#2ECC71",
-          "lineWidth": 2,
-          "showPoints": true
-        }
-      ],
-      "style": {
-        "backgroundColor": "#16213E",
-        "gridColor": "#34495E",
-        "showGrid": true,
-        "showLegend": true,
-        "legendPosition": "top",
-        "padding": {"top": 60, "right": 32, "bottom": 32, "left": 32},
-        "animation": {
-          "duration": 2200,
-          "curve": "easeInOut"
-        }
-      },
-      "width": 750,
-      "height": 350
-    };
+  /// Custom colors pie chart
+  Widget _buildCustomColorsPieChart() {
+    final data = [
+      const PieChartData(value: 30, label: 'Q1', color: Color(0xFFE74C3C)),
+      const PieChartData(value: 25, label: 'Q2', color: Color(0xFF3498DB)),
+      const PieChartData(value: 35, label: 'Q3', color: Color(0xFF2ECC71)),
+      const PieChartData(value: 10, label: 'Q4', color: Color(0xFFF39C12)),
+    ];
 
-    return _buildChartContainer(
-      title: 'MultiLineChart Simple JSON',
-      subtitle: 'Multiple series with simple JSON format',
-      child: MultiLineChart.fromJson(multiLineJson),
+    final style = const PieChartStyle(
+      backgroundColor: Color(0xFF16213E),
+      showLabels: true,
+      showValues: true,
+      showLegend: true,
+      legendPosition: PieChartLegendPosition.bottom,
+      labelPosition: LabelPosition.inside,
+      labelStyle: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: 12,
+      ),
+      valueStyle: TextStyle(
+        color: Colors.white,
+        fontSize: 10,
+      ),
+      animationDuration: Duration(milliseconds: 1800),
+      animationCurve: Curves.bounceOut,
     );
-  }
-
-  /// Plotly JSON multi-line chart
-  Widget _buildPlotlyJsonMultiLineChart() {
-    const plotlyMultiJson = '''
-    {
-      "data": [
-        {
-          "x": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
-          "y": [85, 92, 78, 95, 88],
-          "name": "Team Alpha",
-          "type": "scatter",
-          "mode": "lines+markers",
-          "line": {"color": "#9B59B6", "width": 3},
-          "marker": {"size": 8}
-        },
-        {
-          "x": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
-          "y": [70, 85, 90, 87, 92],
-          "name": "Team Beta",
-          "type": "scatter",
-          "mode": "lines+markers",
-          "line": {"color": "#E67E22", "width": 2, "shape": "spline"},
-          "marker": {"size": 6}
-        },
-        {
-          "x": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
-          "y": [60, 75, 82, 79, 85],
-          "name": "Team Gamma",
-          "type": "scatter",
-          "mode": "lines",
-          "line": {"color": "#1ABC9C", "width": 3, "shape": "spline"}
-        }
-      ],
-      "layout": {
-        "width": 750,
-        "height": 350,
-        "plot_bgcolor": "#16213E",
-        "paper_bgcolor": "#16213E",
-        "showlegend": true,
-        "legend": {"orientation": "top"},
-        "xaxis": {
-          "showgrid": true,
-          "gridcolor": "#34495E"
-        },
-        "yaxis": {
-          "showgrid": true,
-          "gridcolor": "#34495E"
-        },
-        "margin": {
-          "l": 32,
-          "r": 32,
-          "t": 60,
-          "b": 32
-        }
-      }
-    }
-    ''';
 
     return _buildChartContainer(
-      title: 'MultiLineChart Plotly JSON',
-      subtitle: 'Standard Plotly format with multiple traces',
-      child: MultiLineChart.fromJsonString(plotlyMultiJson),
-    );
-  }
-
-  /// Interactive multi-line chart with zoom and pan
-  Widget _buildInteractiveMultiLineChart() {
-    final interactiveData = {
-      "data": [
-        {
-          "x": List.generate(20, (i) => "Day ${i + 1}"),
-          "y": List.generate(20, (i) => 50 + (i * 0.8) + (i % 7) * 5),
-          "name": "Stock A",
-          "line": {"color": "#E74C3C", "width": 2}
-        },
-        {
-          "x": List.generate(20, (i) => "Day ${i + 1}"),
-          "y": List.generate(20, (i) => 45 + (i * 0.6) + (i % 5) * 4),
-          "name": "Stock B",
-          "line": {"color": "#3498DB", "width": 2, "shape": "spline"}
-        },
-        {
-          "x": List.generate(20, (i) => "Day ${i + 1}"),
-          "y": List.generate(20, (i) => 40 + (i * 0.7) + (i % 6) * 3),
-          "name": "Stock C",
-          "line": {"color": "#2ECC71", "width": 2}
-        }
-      ],
-      "layout": {
-        "width": 750,
-        "height": 350,
-        "plot_bgcolor": "#16213E",
-        "showlegend": true,
-        "crosshair": {
-          "enabled": true,
-          "lineColor": "#7F8C8D",
-          "showLabel": true
-        },
-        "hoverlabel": {
-          "bgcolor": "#34495E",
-          "font": {"color": "#ECF0F1"}
-        }
-      },
-      "enableZoom": true,
-      "enablePan": true
-    };
-
-    return _buildChartContainer(
-      title: 'Interactive MultiLineChart',
-      subtitle: 'Zoom, pan, and crosshair functionality (try pinch/scroll to zoom)',
-      child: MultiLineChart.fromJson(interactiveData),
-    );
-  }
-
-  /// From data arrays multi-line chart
-  Widget _buildFromDataMultiLineChart() {
-    return _buildChartContainer(
-      title: 'MultiLineChart From Data',
-      subtitle: 'Created from simple data arrays',
-      child: MultiLineChart.fromData(
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        seriesData: [
-          [20, 30, 25, 35, 40, 38], // Series 1
-          [15, 25, 30, 28, 35, 33], // Series 2
-          [10, 20, 15, 25, 30, 28], // Series 3
-        ],
-        seriesNames: ['Revenue', 'Costs', 'Profit'],
-        colors: [
-          const Color(0xFF4CAF50),
-          const Color(0xFFFF9800),
-          const Color(0xFF2196F3)
-        ],
-        width: 750,
-        height: 350,
-        style: {
-          'backgroundColor': '#16213E',
-          'gridColor': '#34495E',
-          'showGrid': true,
-          'showLegend': true,
-          'legendPosition': 'top',
-          'padding': {'top': 60, 'right': 32, 'bottom': 32, 'left': 32},
-          'animation': {
-            'duration': 2500,
-            'curve': 'easeInOut'
-          }
-        },
+      title: 'Custom Colors Pie Chart',
+      subtitle: 'Quarterly data with custom styling',
+      child: MaterialPieChart(
+        data: data,
+        width: 600,
+        height: 400,
+        style: style,
       ),
     );
   }
 
- 
+  /// Sales data pie chart
+  Widget _buildSalesDataPieChart() {
+    final data = [
+      const PieChartData(value: 120, label: 'Electronics', color: Color(0xFF9B59B6)),
+      const PieChartData(value: 80, label: 'Clothing', color: Color(0xFF1ABC9C)),
+      const PieChartData(value: 60, label: 'Books', color: Color(0xFFE67E22)),
+      const PieChartData(value: 40, label: 'Home & Garden', color: Color(0xFF34495E)),
+      const PieChartData(value: 30, label: 'Sports', color: Color(0xFFE74C3C)),
+      const PieChartData(value: 20, label: 'Beauty', color: Color(0xFFF39C12)),
+    ];
+
+    final style = const PieChartStyle(
+      backgroundColor: Color(0xFF16213E),
+      showLabels: true,
+      showValues: true,
+      showLegend: true,
+      legendPosition: PieChartLegendPosition.right,
+      labelPosition: LabelPosition.outside,
+      labelOffset: 30,
+      animationDuration: Duration(milliseconds: 2200),
+      animationCurve: Curves.easeInOut,
+    );
+
+    return _buildChartContainer(
+      title: 'Sales Data Pie Chart',
+      subtitle: 'Product category sales distribution',
+      child: MaterialPieChart(
+        data: data,
+        width: 600,
+        height: 400,
+        style: style,
+        minSizePercent: 2.0, // Ensure small segments are visible
+      ),
+    );
+  }
+
   // ========================================
   // HELPER WIDGETS
   // ========================================
@@ -499,7 +422,7 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
         // Chart container
         Container(
           width: 800,
-          height: 400,
+          height: 500,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: const Color(0xFF16213E),
@@ -516,6 +439,17 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
           child: child,
         ),
       ],
+    );
+  }
+
+  /// Helper method to show snackbar messages
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color(0xFF7B9E87),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 }
