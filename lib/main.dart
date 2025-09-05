@@ -11,22 +11,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Material Charts Demo',
+      title: 'Material Charts JSON Demo',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: const MaterialChartsDemo(),
+      home: const MaterialChartsJsonDemo(),
     );
   }
 }
 
-/// Enhanced charts demo with pie chart examples
-class MaterialChartsDemo extends StatefulWidget {
-  const MaterialChartsDemo({super.key});
+/// Pie Chart JSON Demo - showcasing Plotly compatibility
+class MaterialChartsJsonDemo extends StatefulWidget {
+  const MaterialChartsJsonDemo({super.key});
 
   @override
-  State<MaterialChartsDemo> createState() => _MaterialChartsDemoState();
+  State<MaterialChartsJsonDemo> createState() => _MaterialChartsJsonDemoState();
 }
 
-class _MaterialChartsDemoState extends State<MaterialChartsDemo>
+class _MaterialChartsJsonDemoState extends State<MaterialChartsJsonDemo>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentChartIndex = 0;
@@ -47,7 +47,7 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Material Pie Charts Demo'),
+        title: const Text('Pie Chart JSON Demo - Plotly Compatible'),
         backgroundColor: const Color(0xFF16213E),
         foregroundColor: Colors.white,
         bottom: TabBar(
@@ -56,7 +56,7 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
           labelColor: Colors.white,
           unselectedLabelColor: const Color(0xFFB0BEC5),
           tabs: const [
-            Tab(text: 'PieChart Examples'),
+            Tab(text: 'JSON Examples'),
           ],
         ),
       ),
@@ -74,21 +74,17 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
         child: TabBarView(
           controller: _tabController,
           children: [
-            _buildPieChartExamples(),
+            _buildJsonExamples(),
           ],
         ),
       ),
     );
   }
 
-  // ========================================
-  // PIE CHART EXAMPLES
-  // ========================================
-
-  Widget _buildPieChartExamples() {
+  Widget _buildJsonExamples() {
     return Column(
       children: [
-        // Pie chart tab buttons
+        // JSON example buttons
         Container(
           margin: const EdgeInsets.all(16.0),
           padding: const EdgeInsets.all(8.0),
@@ -109,46 +105,51 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildTabButton(0, 'Basic Pie'),
+                _buildTabButton(0, 'Your Example'),
                 const SizedBox(width: 8),
-                _buildTabButton(1, 'Doughnut'),
+                _buildTabButton(1, 'Simple JSON'),
                 const SizedBox(width: 8),
-                _buildTabButton(2, 'Interactive'),
+                _buildTabButton(2, 'Basic Plotly'),
                 const SizedBox(width: 8),
-                _buildTabButton(3, 'Custom Colors'),
+                _buildTabButton(3, 'Doughnut JSON'),
                 const SizedBox(width: 8),
-                _buildTabButton(4, 'Sales Data'),
+                _buildTabButton(4, 'Complex JSON'),
+                const SizedBox(width: 8),
+                _buildTabButton(5, 'Advanced JSON'),
               ],
             ),
           ),
         ),
         
-        // Pie chart content
+        // Chart content
         Expanded(
           child: Center(
-            child: _buildCurrentPieChart(),
+            child: _buildCurrentChart(),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildCurrentPieChart() {
+  Widget _buildCurrentChart() {
     switch (_currentChartIndex) {
       case 0:
         return _buildBasicPieChart();
       case 1:
-        return _buildDoughnutChart();
+        return _buildSimpleJsonChart();
       case 2:
-        return _buildInteractivePieChart();
+        return _buildBasicPlotlyChart();
       case 3:
-        return _buildCustomColorsPieChart();
+        return _buildDoughnutJsonChart();
       case 4:
-        return _buildSalesDataPieChart();
+        return _buildComplexJsonChart();
+      case 5:
+        return _buildAdvancedJsonChart();
       default:
         return _buildBasicPieChart();
     }
   }
+
 
   /// Basic pie chart
   Widget _buildBasicPieChart() {
@@ -165,6 +166,17 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
       showLabels: true,
       showValues: true,
       showLegend: true,
+      valueStyle: TextStyle(
+        color: Colors.white,
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+      ),
+      connectorLineColor: Colors.white,
+      labelStyle: TextStyle(
+        color: Colors.white,
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+      ),
       legendPosition: PieChartLegendPosition.right,
       labelPosition: LabelPosition.outside,
       animationDuration: Duration(milliseconds: 2000),
@@ -183,169 +195,177 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
     );
   }
 
-  /// Doughnut chart
-  Widget _buildDoughnutChart() {
-    final data = [
-      const PieChartData(value: 40, label: 'Revenue', color: Color(0xFF2ECC71)),
-      const PieChartData(value: 30, label: 'Costs', color: Color(0xFFE74C3C)),
-      const PieChartData(value: 20, label: 'Marketing', color: Color(0xFF3498DB)),
-      const PieChartData(value: 10, label: 'R&D', color: Color(0xFFF39C12)),
-    ];
+  
 
-    final style = const PieChartStyle(
-      backgroundColor: Color(0xFF16213E),
-      holeRadius: 0.4, // Creates doughnut effect
-      showLabels: true,
-      showValues: true,
-      showLegend: true,
-      legendPosition: PieChartLegendPosition.bottom,
-      labelPosition: LabelPosition.outside,
-      animationDuration: Duration(milliseconds: 2500),
-      animationCurve: Curves.easeInOut,
-    );
+  /// Simple JSON format
+  Widget _buildSimpleJsonChart() {
+    final simpleJson = {
+      "data": [
+        {"value": 35, "label": "Desktop"},
+        {"value": 45, "label": "Mobile"},
+        {"value": 20, "label": "Tablet"}
+      ],
+      "layout": {
+        "width": 500,
+        "height": 350,
+        "showlegend": true
+      }
+    };
 
     return _buildChartContainer(
-      title: 'Doughnut Chart',
-      subtitle: 'Pie chart with center hole for doughnut effect',
-      child: MaterialPieChart(
-        data: data,
-        width: 600,
-        height: 400,
-        style: style,
-      ),
+      title: 'Simple JSON Format',
+      subtitle: 'Basic JSON with minimal configuration',
+      child: MaterialPieChart.fromJson(simpleJson),
     );
   }
 
-  /// Interactive pie chart
-  Widget _buildInteractivePieChart() {
-    final data = [
-      PieChartData(
-        value: 45,
-        label: 'North America',
-        color: const Color(0xFF8E44AD),
-        onTap: () => _showSnackBar('North America: 45%'),
-      ),
-      PieChartData(
-        value: 25,
-        label: 'Europe',
-        color: const Color(0xFF1ABC9C),
-        onTap: () => _showSnackBar('Europe: 25%'),
-      ),
-      PieChartData(
-        value: 20,
-        label: 'Asia',
-        color: const Color(0xFFE67E22),
-        onTap: () => _showSnackBar('Asia: 20%'),
-      ),
-      PieChartData(
-        value: 10,
-        label: 'Others',
-        color: const Color(0xFF95A5A6),
-        onTap: () => _showSnackBar('Others: 10%'),
-      ),
-    ];
-
-    final style = const PieChartStyle(
-      backgroundColor: Color(0xFF16213E),
-      showLabels: true,
-      showValues: true,
-      showLegend: true,
-      legendPosition: PieChartLegendPosition.right,
-      labelPosition: LabelPosition.outside,
-      showConnectorLines: true,
-      connectorLineColor: Color(0xFF7F8C8D),
-      animationDuration: Duration(milliseconds: 3000),
-      animationCurve: Curves.elasticOut,
-    );
+  /// Basic Plotly format
+  Widget _buildBasicPlotlyChart() {
+    final basicPlotlyJson = {
+      "data": [{
+        "values": [45.2, 28.1, 18.7, 8.0],
+        "labels": ["Chrome", "Firefox", "Safari", "Edge"],
+        "type": "pie"
+      }],
+      "layout": {
+        "title": "Browser Usage Statistics",
+        "width": 550,
+        "height": 380
+      }
+    };
 
     return _buildChartContainer(
-      title: 'Interactive Pie Chart',
-      subtitle: 'Click on segments to see details',
-      child: MaterialPieChart(
-        data: data,
-        width: 600,
-        height: 400,
-        style: style,
-        interactive: true,
-        onAnimationComplete: () => _showSnackBar('Animation completed!'),
-      ),
+      title: 'Basic Plotly Format',
+      subtitle: 'Standard Plotly.js pie chart structure',
+      child: MaterialPieChart.fromJson(basicPlotlyJson),
     );
   }
 
-  /// Custom colors pie chart
-  Widget _buildCustomColorsPieChart() {
-    final data = [
-      const PieChartData(value: 30, label: 'Q1', color: Color(0xFFE74C3C)),
-      const PieChartData(value: 25, label: 'Q2', color: Color(0xFF3498DB)),
-      const PieChartData(value: 35, label: 'Q3', color: Color(0xFF2ECC71)),
-      const PieChartData(value: 10, label: 'Q4', color: Color(0xFFF39C12)),
-    ];
-
-    final style = const PieChartStyle(
-      backgroundColor: Color(0xFF16213E),
-      showLabels: true,
-      showValues: true,
-      showLegend: true,
-      legendPosition: PieChartLegendPosition.bottom,
-      labelPosition: LabelPosition.inside,
-      labelStyle: TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-        fontSize: 12,
-      ),
-      valueStyle: TextStyle(
-        color: Colors.white,
-        fontSize: 10,
-      ),
-      animationDuration: Duration(milliseconds: 1800),
-      animationCurve: Curves.bounceOut,
-    );
+  /// Doughnut chart with hole
+  Widget _buildDoughnutJsonChart() {
+    final doughnutJson = {
+      "data": [{
+        "values": [35, 25, 20, 15, 5],
+        "labels": ["Mobile", "Desktop", "Tablet", "Smart TV", "Other"],
+        "type": "pie",
+        "hole": 0.4,
+        "marker": {
+          "colors": ["#FF6B6B", "#4ECDC4", "#45B7D1", "#FFA07A", "#98D8C8"]
+        }
+      }],
+      "layout": {
+        "title": "Device Market Share",
+        "width": 500,
+        "height": 400,
+        "showlegend": true,
+        "legend": {
+          "orientation": "v"
+        }
+      }
+    };
 
     return _buildChartContainer(
-      title: 'Custom Colors Pie Chart',
-      subtitle: 'Quarterly data with custom styling',
-      child: MaterialPieChart(
-        data: data,
-        width: 600,
-        height: 400,
-        style: style,
-      ),
+      title: 'Doughnut Chart JSON',
+      subtitle: 'Plotly doughnut using hole parameter',
+      child: MaterialPieChart.fromJson(doughnutJson),
     );
   }
 
-  /// Sales data pie chart
-  Widget _buildSalesDataPieChart() {
-    final data = [
-      const PieChartData(value: 120, label: 'Electronics', color: Color(0xFF9B59B6)),
-      const PieChartData(value: 80, label: 'Clothing', color: Color(0xFF1ABC9C)),
-      const PieChartData(value: 60, label: 'Books', color: Color(0xFFE67E22)),
-      const PieChartData(value: 40, label: 'Home & Garden', color: Color(0xFF34495E)),
-      const PieChartData(value: 30, label: 'Sports', color: Color(0xFFE74C3C)),
-      const PieChartData(value: 20, label: 'Beauty', color: Color(0xFFF39C12)),
-    ];
-
-    final style = const PieChartStyle(
-      backgroundColor: Color(0xFF16213E),
-      showLabels: true,
-      showValues: true,
-      showLegend: true,
-      legendPosition: PieChartLegendPosition.right,
-      labelPosition: LabelPosition.outside,
-      labelOffset: 30,
-      animationDuration: Duration(milliseconds: 2200),
-      animationCurve: Curves.easeInOut,
-    );
+  /// Complex JSON with all attributes
+  Widget _buildComplexJsonChart() {
+    final complexJson = {
+      "data": [{
+        "values": [30, 25, 20, 15, 10],
+        "labels": ["JavaScript", "Python", "Java", "C++", "Go"],
+        "type": "pie",
+        "rotation": 45,
+        "textinfo": "label+percent",
+        "textposition": "outside",
+        "marker": {
+          "colors": ["#F7DC6F", "#BB8FCE", "#85C1E9", "#F8C471", "#82E0AA"]
+        }
+      }],
+      "layout": {
+        "title": "Programming Language Popularity",
+        "width": 600,
+        "height": 450,
+        "paper_bgcolor": "#2C3E50",
+        "plot_bgcolor": "#34495E",
+        "showlegend": true,
+        "legend": {
+          "orientation": "h",
+          "x": 0,
+          "y": -0.1
+        },
+        "font": {
+          "size": 14,
+          "color": "#ECF0F1"
+        }
+      }
+    };
 
     return _buildChartContainer(
-      title: 'Sales Data Pie Chart',
-      subtitle: 'Product category sales distribution',
-      child: MaterialPieChart(
-        data: data,
-        width: 600,
-        height: 400,
-        style: style,
-        minSizePercent: 2.0, // Ensure small segments are visible
-      ),
+      title: 'Complex JSON Schema',
+      subtitle: 'All Plotly attributes: rotation, textinfo, colors, fonts',
+      child: MaterialPieChart.fromJson(complexJson),
+    );
+  }
+
+  /// Advanced JSON with extensive styling
+  Widget _buildAdvancedJsonChart() {
+    final advancedJson = {
+      "data": [{
+        "values": [120, 100, 80, 60, 40, 20],
+        "labels": ["Enterprise", "SMB", "Startup", "Education", "Non-Profit", "Government"],
+        "type": "pie",
+        "hole": 0.3,
+        "rotation": -90,
+        "textinfo": "label+value+percent",
+        "textposition": "auto",
+        "marker": {
+          "colors": [
+            "#E74C3C", "#3498DB", "#2ECC71", 
+            "#F39C12", "#9B59B6", "#1ABC9C"
+          ],
+          "line": {
+            "color": "#FFFFFF",
+            "width": 3
+          }
+        }
+      }],
+      "layout": {
+        "title": "Customer Segment Analysis",
+        "width": 650,
+        "height": 500,
+        "paper_bgcolor": "#1A1A2E",
+        "plot_bgcolor": "#16213E",
+        "showlegend": true,
+        "legend": {
+          "orientation": "v",
+          "x": 1.02,
+          "y": 0.5,
+          "bgcolor": "rgba(22, 33, 62, 0.8)",
+          "bordercolor": "#2C3E50",
+          "borderwidth": 1
+        },
+        "font": {
+          "family": "Arial, sans-serif",
+          "size": 12,
+          "color": "#E8F4F8"
+        },
+        "margin": {
+          "l": 50,
+          "r": 50,
+          "t": 80,
+          "b": 50
+        }
+      }
+    };
+
+    return _buildChartContainer(
+      title: 'Advanced JSON Configuration',
+      subtitle: 'Complete Plotly schema: margins, fonts, borders, positions',
+      child: MaterialPieChart.fromJson(advancedJson),
     );
   }
 
@@ -378,7 +398,7 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
         ),
       ),
@@ -403,7 +423,7 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
                 title,
                 style: const TextStyle(
                   color: Color(0xFFE8F4F8),
-                  fontSize: 24,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -412,7 +432,7 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
                 subtitle,
                 style: const TextStyle(
                   color: Color(0xFFB0BEC5),
-                  fontSize: 14,
+                  fontSize: 13,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -422,7 +442,7 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
         // Chart container
         Container(
           width: 800,
-          height: 500,
+          height: 550,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: const Color(0xFF16213E),
@@ -439,17 +459,6 @@ class _MaterialChartsDemoState extends State<MaterialChartsDemo>
           child: child,
         ),
       ],
-    );
-  }
-
-  /// Helper method to show snackbar messages
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFF7B9E87),
-        duration: const Duration(seconds: 2),
-      ),
     );
   }
 }
