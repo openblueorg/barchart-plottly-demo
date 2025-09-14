@@ -1,7 +1,7 @@
 export 'src/shared/shared_models.dart';
 
-export 'src/area_chart/models.dart';
-export 'src/area_chart/widgets.dart';
+export 'src/candlestick_chart/models.dart';
+export 'src/candlestick_chart/widgets.dart';
 
 /// Created by: Vishnudas V
 /// GitHub: [vishnudas-bluefox](https://github.com/vishnudas-bluefox/material_charts)

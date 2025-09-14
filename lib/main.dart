@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'material_charts/material_charts.dart';
-// Import your chart files:
-// import 'lib/src/area_chart/models.dart';
-// import 'lib/src/area_chart/widgets.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Area Chart Demo',
+      title: 'Candlestick Chart Demo',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: const ChartTestScreen(),
     );
@@ -30,332 +27,106 @@ class ChartTestScreen extends StatefulWidget {
 }
 
 class _ChartTestScreenState extends State<ChartTestScreen> {
-  int _selectedIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Material Area Charts'), elevation: 2),
-      body: Column(
-        children: [
-          // Tab bar
-          Container(
-            margin: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _selectedIndex = 0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color:
-                            _selectedIndex == 0
-                                ? Colors.blue
-                                : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'Original API',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color:
-                              _selectedIndex == 0 ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _selectedIndex = 1),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color:
-                            _selectedIndex == 1
-                                ? Colors.blue
-                                : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'Plotly JSON',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color:
-                              _selectedIndex == 1 ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _selectedIndex = 2),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color:
-                            _selectedIndex == 2
-                                ? Colors.blue
-                                : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'Comparison',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color:
-                              _selectedIndex == 2 ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: _buildContent(),
-            ),
-          ),
-        ],
+      appBar: AppBar(title: const Text('Candlestick Chart Demo'), elevation: 2),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: _buildCandlestickExamples(),
       ),
     );
   }
 
-  Widget _buildContent() {
-    switch (_selectedIndex) {
-      case 0:
-        return _buildOriginalExamples();
-      case 1:
-        return _buildPlotlyExamples();
-      case 2:
-        return _buildComparisonView();
-      default:
-        return const SizedBox();
-    }
-  }
-
-  Widget _buildOriginalExamples() {
+  Widget _buildCandlestickExamples() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Original Implementation',
+          'Candlestick Chart Examples',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
 
         _buildCard(
-          title: 'Simple Area Chart',
-          child: MaterialAreaChart(
-            series: [
-              AreaChartSeries(
-                name: 'Revenue',
-                dataPoints: const [
-                  AreaChartData(value: 10, label: 'Jan'),
-                  AreaChartData(value: 15, label: 'Feb'),
-                  AreaChartData(value: 12, label: 'Mar'),
-                  AreaChartData(value: 18, label: 'Apr'),
-                  AreaChartData(value: 22, label: 'May'),
-                  AreaChartData(value: 25, label: 'Jun'),
-                ],
-                color: Colors.blue,
-                gradientColor: Colors.blue.withOpacity(0.2),
-                lineWidth: 3.0,
-                showPoints: true,
-                pointSize: 5.0,
-              ),
-            ],
+          title: 'Simple Stock Price Chart',
+          description: 'Basic candlestick chart showing daily stock prices',
+          child: MaterialCandlestickChart(
+            data: _getSampleStockData(),
             width: 400,
-            height: 250,
-            style: const AreaChartStyle(
-              backgroundColor: Colors.white,
-              showGrid: true,
+            height: 300,
+            backgroundColor: Colors.white,
+            style: const CandlestickStyle(
+              bullishColor: Colors.green,
+              bearishColor: Colors.red,
+              candleWidth: 8.0,
+              wickWidth: 1.5,
+              spacing: 0.3,
               animationDuration: Duration(milliseconds: 2000),
             ),
+            axisConfig: const ChartAxisConfig(
+              priceDivisions: 6,
+              dateDivisions: 5,
+              yAxisWidth: 80.0,
+              xAxisHeight: 40.0,
+            ),
+            showGrid: true,
           ),
         ),
 
         _buildCard(
-          title: 'Multi-Series Chart',
-          child: MaterialAreaChart(
-            series: [
-              AreaChartSeries(
-                name: 'Product A',
-                dataPoints: const [
-                  AreaChartData(value: 20, label: 'Q1'),
-                  AreaChartData(value: 25, label: 'Q2'),
-                  AreaChartData(value: 22, label: 'Q3'),
-                  AreaChartData(value: 28, label: 'Q4'),
-                ],
-                color: Colors.red,
-                gradientColor: Colors.red.withOpacity(0.3),
-                lineWidth: 2.0,
-              ),
-              AreaChartSeries(
-                name: 'Product B',
-                dataPoints: const [
-                  AreaChartData(value: 15, label: 'Q1'),
-                  AreaChartData(value: 18, label: 'Q2'),
-                  AreaChartData(value: 20, label: 'Q3'),
-                  AreaChartData(value: 23, label: 'Q4'),
-                ],
-                color: Colors.green,
-                gradientColor: Colors.green.withOpacity(0.3),
-                lineWidth: 2.0,
-              ),
-            ],
+          title: 'Custom Styled Chart',
+          description: 'Candlestick chart with custom colors and styling',
+          child: MaterialCandlestickChart(
+            data: _getSampleStockData(),
             width: 400,
-            height: 250,
+            height: 300,
+            backgroundColor: const Color(0xFFF8F9FA),
+            style: const CandlestickStyle(
+              bullishColor: Color(0xFF2E7D32),
+              bearishColor: Color(0xFFD32F2F),
+              candleWidth: 10.0,
+              wickWidth: 2.0,
+              spacing: 0.4,
+              animationDuration: Duration(milliseconds: 1500),
+              animationCurve: Curves.easeOut,
+            ),
+            axisConfig: const ChartAxisConfig(
+              priceDivisions: 8,
+              dateDivisions: 6,
+              yAxisWidth: 70.0,
+              xAxisHeight: 35.0,
+            ),
+            showGrid: true,
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildPlotlyExamples() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Plotly JSON Implementation',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
 
         _buildCard(
-          title: 'From Python Plotly JSON',
+          title: 'Compact Chart',
           description:
-              'Direct conversion from Python plotly.graph_objects output',
-          child: MaterialAreaChart.fromPlotlyJson(
-            plotlyJson: _getSimplePlotlyJson(),
+              'Smaller candlesticks with tight spacing for more data points',
+          child: MaterialCandlestickChart(
+            data: _getExtendedStockData(),
             width: 400,
             height: 250,
-          ),
-        ),
-
-        _buildCard(
-          title: 'Multi-Series with Custom Colors',
-          description: 'Multiple traces with hex colors and RGBA fills',
-          child: MaterialAreaChart.fromPlotlyJson(
-            plotlyJson: _getMultiSeriesPlotlyJson(),
-            width: 400,
-            height: 250,
-          ),
-        ),
-
-        _buildCard(
-          title: 'Style Overrides',
-          description: 'Plotly data with Flutter-specific style customizations',
-          child: MaterialAreaChart.fromPlotlyJson(
-            plotlyJson: _getSimplePlotlyJson(),
-            width: 400,
-            height: 250,
-            styleOverrides: const AreaChartStyle(
-              backgroundColor: Color(0xFFF8F9FA),
-              gridColor: Colors.blue,
+            backgroundColor: Colors.white,
+            style: const CandlestickStyle(
+              bullishColor: Colors.green,
+              bearishColor: Colors.red,
+              candleWidth: 4.0,
+              wickWidth: 1.0,
+              spacing: 0.1,
               animationDuration: Duration(milliseconds: 3000),
-              showPoints: true,
-              defaultPointSize: 8.0,
             ),
+            axisConfig: const ChartAxisConfig(
+              priceDivisions: 5,
+              dateDivisions: 4,
+              yAxisWidth: 60.0,
+              xAxisHeight: 30.0,
+            ),
+            showGrid: true,
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildComparisonView() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Side-by-Side Comparison',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
-
-        const Text(
-          'Same Data, Different APIs',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 16),
-
-        Row(
-          children: [
-            Expanded(
-              child: _buildCard(
-                title: 'Original API',
-                child: MaterialAreaChart(
-                  series: [
-                    AreaChartSeries(
-                      name: 'Sales',
-                      dataPoints: const [
-                        AreaChartData(value: 100, label: 'Jan'),
-                        AreaChartData(value: 120, label: 'Feb'),
-                        AreaChartData(value: 110, label: 'Mar'),
-                        AreaChartData(value: 140, label: 'Apr'),
-                      ],
-                      color: Colors.purple,
-                      gradientColor: Colors.purple.withOpacity(0.2),
-                      lineWidth: 3.0,
-                    ),
-                  ],
-                  width: 350,
-                  height: 200,
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildCard(
-                title: 'Plotly JSON',
-                child: MaterialAreaChart.fromPlotlyJson(
-                  plotlyJson: '''
-                  {
-                    "data": [
-                      {
-                        "x": ["Jan", "Feb", "Mar", "Apr"],
-                        "y": [100, 120, 110, 140],
-                        "fill": "tozeroy",
-                        "name": "Sales",
-                        "line": {"color": "purple", "width": 3},
-                        "fillcolor": "rgba(128, 0, 128, 0.2)"
-                      }
-                    ],
-                    "layout": {
-                      "title": "Monthly Sales"
-                    }
-                  }
-                  ''',
-                  width: 350,
-                  height: 200,
-                ),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 24),
-        const Text(
-          'Performance Metrics',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 16),
-
-        _buildMetricsTable(),
       ],
     );
   }
@@ -389,145 +160,120 @@ class _ChartTestScreenState extends State<ChartTestScreen> {
     );
   }
 
-  Widget _buildMetricsTable() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Table(
-          columnWidths: const {
-            0: FlexColumnWidth(2),
-            1: FlexColumnWidth(1),
-            2: FlexColumnWidth(1),
-          },
-          children: [
-            TableRow(
-              decoration: BoxDecoration(color: Colors.grey[100]),
-              children: const [
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                    'Feature',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                    'Original',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                    'Plotly JSON',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-            _buildTableRow('Data Input', '✅ Manual', '✅ JSON/Map'),
-            _buildTableRow('Python Compatibility', '❌ No', '✅ Direct'),
-            _buildTableRow(
-              'Styling Options',
-              '✅ Full Control',
-              '✅ + Overrides',
-            ),
-            _buildTableRow('Performance', '✅ Optimal', '✅ Good*'),
-            _buildTableRow('Type Safety', '✅ Compile-time', '⚠️ Runtime'),
-            _buildTableRow(
-              'Learning Curve',
-              '⚠️ Flutter-specific',
-              '✅ Familiar',
-            ),
-          ],
-        ),
+  List<CandlestickData> _getSampleStockData() {
+    final now = DateTime.now();
+    return [
+      CandlestickData(
+        date: now.subtract(const Duration(days: 10)),
+        open: 100.0,
+        high: 105.0,
+        low: 98.0,
+        close: 103.0,
+        volume: 1000000,
       ),
-    );
+      CandlestickData(
+        date: now.subtract(const Duration(days: 9)),
+        open: 103.0,
+        high: 108.0,
+        low: 101.0,
+        close: 106.0,
+        volume: 1200000,
+      ),
+      CandlestickData(
+        date: now.subtract(const Duration(days: 8)),
+        open: 106.0,
+        high: 107.0,
+        low: 102.0,
+        close: 104.0,
+        volume: 900000,
+      ),
+      CandlestickData(
+        date: now.subtract(const Duration(days: 7)),
+        open: 104.0,
+        high: 110.0,
+        low: 103.0,
+        close: 108.0,
+        volume: 1500000,
+      ),
+      CandlestickData(
+        date: now.subtract(const Duration(days: 6)),
+        open: 108.0,
+        high: 112.0,
+        low: 106.0,
+        close: 109.0,
+        volume: 1100000,
+      ),
+      CandlestickData(
+        date: now.subtract(const Duration(days: 5)),
+        open: 109.0,
+        high: 111.0,
+        low: 105.0,
+        close: 107.0,
+        volume: 800000,
+      ),
+      CandlestickData(
+        date: now.subtract(const Duration(days: 4)),
+        open: 107.0,
+        high: 109.0,
+        low: 103.0,
+        close: 105.0,
+        volume: 950000,
+      ),
+      CandlestickData(
+        date: now.subtract(const Duration(days: 3)),
+        open: 105.0,
+        high: 108.0,
+        low: 102.0,
+        close: 106.0,
+        volume: 1300000,
+      ),
+      CandlestickData(
+        date: now.subtract(const Duration(days: 2)),
+        open: 106.0,
+        high: 110.0,
+        low: 104.0,
+        close: 108.0,
+        volume: 1400000,
+      ),
+      CandlestickData(
+        date: now.subtract(const Duration(days: 1)),
+        open: 108.0,
+        high: 115.0,
+        low: 107.0,
+        close: 112.0,
+        volume: 1600000,
+      ),
+    ];
   }
 
-  TableRow _buildTableRow(String feature, String original, String plotly) {
-    return TableRow(
-      children: [
-        Padding(padding: const EdgeInsets.all(8), child: Text(feature)),
-        Padding(padding: const EdgeInsets.all(8), child: Text(original)),
-        Padding(padding: const EdgeInsets.all(8), child: Text(plotly)),
-      ],
-    );
-  }
+  List<CandlestickData> _getExtendedStockData() {
+    final now = DateTime.now();
+    final data = <CandlestickData>[];
 
-  String _getSimplePlotlyJson() {
-    return '''
-    {
-      "data": [
-        {
-          "x": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-          "y": [20, 14, 23, 25, 22, 16],
-          "type": "scatter",
-          "mode": "lines",
-          "fill": "tozeroy",
-          "name": "Monthly Sales",
-          "line": {
-            "color": "#4CAF50",
-            "width": 3
-          },
-          "marker": {
-            "size": 6
-          },
-          "fillcolor": "rgba(76, 175, 80, 0.3)"
-        }
-      ],
-      "layout": {
-        "title": "Sales Performance",
-        "xaxis": {
-          "title": "Month"
-        },
-        "yaxis": {
-          "title": "Sales (K)"
-        },
-        "plot_bgcolor": "#FAFAFA"
-      }
+    // Generate 20 days of sample data
+    for (int i = 20; i >= 0; i--) {
+      final basePrice = 100.0 + (20 - i) * 0.5;
+      final random = (i * 7) % 10; // Simple pseudo-random based on day
+
+      final open = basePrice + (random - 5) * 0.5;
+      final close = open + (random % 3 - 1) * 1.5;
+      final high =
+          [open, close].reduce((a, b) => a > b ? a : b) + (random % 2) * 1.0;
+      final low =
+          [open, close].reduce((a, b) => a < b ? a : b) - (random % 2) * 1.0;
+
+      data.add(
+        CandlestickData(
+          date: now.subtract(Duration(days: i)),
+          open: open,
+          high: high,
+          low: low,
+          close: close,
+          volume: 800000 + (random * 100000),
+        ),
+      );
     }
-    ''';
-  }
 
-  String _getMultiSeriesPlotlyJson() {
-    return '''
-    {
-      "data": [
-        {
-          "x": [1, 2, 3, 4, 5, 6],
-          "y": [10, 15, 13, 17, 16, 18],
-          "type": "scatter",
-          "mode": "lines",
-          "fill": "tozeroy",
-          "name": "Product A",
-          "line": {
-            "color": "#FF6B6B",
-            "width": 3
-          },
-          "fillcolor": "rgba(255, 107, 107, 0.3)"
-        },
-        {
-          "x": [1, 2, 3, 4, 5, 6],
-          "y": [8, 12, 11, 14, 13, 15],
-          "type": "scatter",
-          "mode": "lines",
-          "fill": "tonexty",
-          "name": "Product B",
-          "line": {
-            "color": "#4ECDC4",
-            "width": 2
-          },
-          "fillcolor": "rgba(78, 205, 196, 0.3)"
-        }
-      ],
-      "layout": {
-        "title": "Product Performance",
-        "xaxis": {"title": "Quarter"},
-        "yaxis": {"title": "Performance Score"}
-      }
-    }
-    ''';
+    return data;
   }
 }
