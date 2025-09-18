@@ -22,9 +22,106 @@ class MaterialChartHollowSemiCircle extends BaseChart {
     super.style, // Optional style configuration for the chart
     super.onAnimationComplete, // Optional callback when animation completes
   }) : assert(
-          hollowRadius > 0 && hollowRadius < 1,
-          'Hollow radius must be between 0 and 1',
-        );
+         hollowRadius > 0 && hollowRadius < 1,
+         'Hollow radius must be between 0 and 1',
+       );
+
+  /// Creates a [MaterialChartHollowSemiCircle] from JSON configuration.
+  /// Supports both simple and Plotly-compatible formats.
+  ///
+  /// Example simple JSON:
+  /// ```json
+  /// {
+  ///   "percentage": 75,
+  ///   "size": 300,
+  ///   "hollowRadius": 0.5,
+  ///   "style": {
+  ///     "activeColor": "#4CAF50",
+  ///     "inactiveColor": "#E0E0E0",
+  ///     "showPercentageText": true,
+  ///     "showLegend": false
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// Example Plotly JSON:
+  /// ```json
+  /// {
+  ///   "data": [
+  ///     {
+  ///       "type": "indicator",
+  ///       "mode": "gauge+number",
+  ///       "value": 75,
+  ///       "gauge": {
+  ///         "axis": {"range": [0, 100]},
+  ///         "bar": {"color": "darkblue"},
+  ///         "bgcolor": "lightgray",
+  ///         "hole": 0.6
+  ///       }
+  ///     }
+  ///   ],
+  ///   "layout": {
+  ///     "width": 400,
+  ///     "height": 200,
+  ///     "font": {"color": "black", "size": 14}
+  ///   }
+  /// }
+  /// ```
+  factory MaterialChartHollowSemiCircle.fromJson(Map<String, dynamic> json) {
+    final config = HollowSemiCircleChartJsonConfig.fromJson(json);
+    return MaterialChartHollowSemiCircle(
+      percentage: config.percentage,
+      size: config.size,
+      hollowRadius: config.hollowRadius,
+      style: config.getChartStyle(),
+      onAnimationComplete: config.onAnimationComplete,
+    );
+  }
+
+  /// Creates a [MaterialChartHollowSemiCircle] from a JSON string.
+  /// Supports both simple and Plotly-compatible formats.
+  factory MaterialChartHollowSemiCircle.fromJsonString(String jsonString) {
+    final config = HollowSemiCircleChartJsonConfig.fromJsonString(jsonString);
+    return MaterialChartHollowSemiCircle(
+      percentage: config.percentage,
+      size: config.size,
+      hollowRadius: config.hollowRadius,
+      style: config.getChartStyle(),
+      onAnimationComplete: config.onAnimationComplete,
+    );
+  }
+
+  /// Creates a [MaterialChartHollowSemiCircle] with simplified parameters.
+  /// This is a convenience constructor for quick chart creation.
+  factory MaterialChartHollowSemiCircle.simple({
+    required double percentage,
+    double size = 200,
+    double hollowRadius = 0.6,
+    Color activeColor = Colors.blue,
+    Color inactiveColor = const Color(0xFFE0E0E0),
+    Color? textColor,
+    bool showPercentageText = true,
+    bool showLegend = true,
+    Duration animationDuration = const Duration(milliseconds: 1500),
+    Curve animationCurve = Curves.easeInOut,
+    VoidCallback? onAnimationComplete,
+  }) {
+    return MaterialChartHollowSemiCircle(
+      percentage: percentage,
+      size: size,
+      hollowRadius: hollowRadius,
+      style: ChartStyle(
+        activeColor: activeColor,
+        inactiveColor: inactiveColor,
+        textColor: textColor,
+        animationDuration: animationDuration,
+        animationCurve: animationCurve,
+        showPercentageText: showPercentageText,
+        showLegend: showLegend,
+      ),
+      onAnimationComplete: onAnimationComplete,
+    );
+  }
 
   @override
   State<MaterialChartHollowSemiCircle> createState() =>
@@ -65,11 +162,11 @@ class _MaterialChartHollowSemiCircleState
         curve: widget.style.animationCurve, // Curve for the animation
       ),
     )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          widget.onAnimationComplete
-              ?.call(); // Call the completion callback if set.
-        }
-      });
+      if (status == AnimationStatus.completed) {
+        widget.onAnimationComplete
+            ?.call(); // Call the completion callback if set.
+      }
+    });
 
     _animationController.forward(); // Start the animation
   }
@@ -136,8 +233,10 @@ class _MaterialChartHollowSemiCircleState
                   MainAxisAlignment.center, // Center align the legend items
               children: [
                 _LegendItem(
-                  color: widget
-                      .style.activeColor, // Color for the active legend item
+                  color:
+                      widget
+                          .style
+                          .activeColor, // Color for the active legend item
                   label: _formatLegendLabel(
                     'Active',
                     widget.percentage,
@@ -146,8 +245,10 @@ class _MaterialChartHollowSemiCircleState
                 ),
                 const SizedBox(width: 24), // Space between legend items
                 _LegendItem(
-                  color: widget.style
-                      .inactiveColor, // Color for the inactive legend item
+                  color:
+                      widget
+                          .style
+                          .inactiveColor, // Color for the inactive legend item
                   label: _formatLegendLabel(
                     'Inactive',
                     100 - widget.percentage,
@@ -178,10 +279,14 @@ class _MaterialChartHollowSemiCircleState
                     painter: HollowSemiCircleChart(
                       percentage:
                           _animation.value, // Current percentage to paint
-                      activeColor: widget
-                          .style.activeColor, // Active color for the chart
-                      inactiveColor: widget
-                          .style.inactiveColor, // Inactive color for the chart
+                      activeColor:
+                          widget
+                              .style
+                              .activeColor, // Active color for the chart
+                      inactiveColor:
+                          widget
+                              .style
+                              .inactiveColor, // Inactive color for the chart
                       hollowRadius: widget.hollowRadius, // Hollow radius ratio
                     ),
                   ),
@@ -193,15 +298,20 @@ class _MaterialChartHollowSemiCircleState
                         _formatPercentage(
                           _animation.value,
                         ), // Format the percentage text
-                        style: widget.style.percentageStyle?.copyWith(
-                              color: widget.style
-                                  .textColor, // Apply custom text color if specified
+                        style:
+                            widget.style.percentageStyle?.copyWith(
+                              color:
+                                  widget
+                                      .style
+                                      .textColor, // Apply custom text color if specified
                             ) ??
                             TextStyle(
                               fontSize: widget.size / 8, // Default font size
                               fontWeight: FontWeight.bold, // Bold font weight
-                              color: widget.style
-                                  .textColor, // Use custom text color if provided
+                              color:
+                                  widget
+                                      .style
+                                      .textColor, // Use custom text color if provided
                             ),
                       ),
                     ),
@@ -253,7 +363,8 @@ class _LegendItem extends StatelessWidget {
         // Display the label text for the legend
         Text(
           label,
-          style: style ??
+          style:
+              style ??
               const TextStyle(
                 fontSize: 14,
               ), // Use the provided style or default size
