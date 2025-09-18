@@ -1,7 +1,7 @@
 export 'src/shared/shared_models.dart';
 
-export 'src/gantt_chart/models.dart';
-export 'src/gantt_chart/widgets.dart';
+export 'src/hollow_semicircle_chart/models.dart';
+export 'src/hollow_semicircle_chart/widgets.dart';
 
 /// Created by: Vishnudas V
 /// GitHub: [vishnudas-bluefox](https://github.com/vishnudas-bluefox/material_charts)
