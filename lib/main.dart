@@ -43,7 +43,7 @@ class BarChartDemo extends StatefulWidget {
 }
 
 class _BarChartDemoState extends State<BarChartDemo> {
-  int _currentIndex = 2;
+  int _currentIndex = 0;
   StreamController<List<double>>? _streamController;
   Timer? _dataTimer;
   List<double> _streamData = [45, 78, 32, 89, 56, 67, 23, 91];
@@ -58,7 +58,7 @@ class _BarChartDemoState extends State<BarChartDemo> {
   final Map<int, double> _chartRotations = {
     0: 0.0, // Traditional API
     1: 0.0, // Simple Data Arrays
-    2: 180.0, // JSON Configuration (matches current JSON config)
+    2: 0.0, // JSON Configuration
     3: 0.0, // Stream Data
   };
 
