@@ -43,7 +43,7 @@ class BarChartDemo extends StatefulWidget {
 }
 
 class _BarChartDemoState extends State<BarChartDemo> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
   StreamController<List<double>>? _streamController;
   Timer? _dataTimer;
   List<double> _streamData = [45, 78, 32, 89, 56, 67, 23, 91];
@@ -53,6 +53,14 @@ class _BarChartDemoState extends State<BarChartDemo> {
 
   // Animation trigger state
   int _animationTrigger = 0;
+
+  // Rotation state for each chart type (index 0-3)
+  final Map<int, double> _chartRotations = {
+    0: 0.0, // Traditional API
+    1: 0.0, // Simple Data Arrays
+    2: 180.0, // JSON Configuration (matches current JSON config)
+    3: 0.0, // Stream Data
+  };
 
   // Aesthetically pleasing pastel color palette
   static const List<Color> pastelColors = [
@@ -208,178 +216,224 @@ class _BarChartDemoState extends State<BarChartDemo> {
   }
 
   Widget _buildTraditionalChart() {
-    return Container(
-      key: _chartKeys[0],
-      width: 1000,
-      height: 400,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF16213E), // Dark container
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
+    return Column(
+      children: [
+        _buildRotationControls(0),
+        Container(
+          key: _chartKeys[0],
+          width: 1000,
+          height: 400,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF16213E), // Dark container
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+            border: Border.all(color: const Color(0xFF2C3E50), width: 1),
           ),
-        ],
-        border: Border.all(color: const Color(0xFF2C3E50), width: 1),
-      ),
-      child: MaterialBarChart(
-        data: [
-          BarChartData(value: 45, label: 'Jan', color: pastelColors[0]),
-          BarChartData(value: 78, label: 'Feb', color: pastelColors[1]),
-          BarChartData(value: 32, label: 'Mar', color: pastelColors[2]),
-          BarChartData(value: 89, label: 'Apr', color: pastelColors[3]),
-          BarChartData(value: 56, label: 'May', color: pastelColors[4]),
-          BarChartData(value: 67, label: 'Jun', color: pastelColors[5]),
-          BarChartData(value: 23, label: 'Jul', color: pastelColors[6]),
-          BarChartData(value: 91, label: 'Aug', color: pastelColors[7]),
-        ],
-        width: 800,
-        height: 300,
-        style: BarChartStyle(
-          barColor: const Color(0xFF7B9E87),
-          gridColor: const Color(0xFF34495E), // Darker grid for contrast
-          backgroundColor: const Color(0xFF16213E), // Dark background
-          barSpacing: 0.3,
-          cornerRadius: 12.0,
-          animationDuration: const Duration(milliseconds: 2000),
-          animationCurve: Curves.easeInOut,
-          gradientEffect: true,
-          gradientColors: const [Color(0xFFB8D4E3), Color(0xFF7B9E87)],
-          labelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFFE8F4F8), // Light text for dark background
-          ),
-          valueStyle: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A2E), // Dark text on light bars
+          child: MaterialBarChart(
+            data: [
+              BarChartData(value: 45, label: 'Jan', color: pastelColors[0]),
+              BarChartData(value: 78, label: 'Feb', color: pastelColors[1]),
+              BarChartData(value: 32, label: 'Mar', color: pastelColors[2]),
+              BarChartData(value: 89, label: 'Apr', color: pastelColors[3]),
+              BarChartData(value: 56, label: 'May', color: pastelColors[4]),
+              BarChartData(value: 67, label: 'Jun', color: pastelColors[5]),
+              BarChartData(value: 23, label: 'Jul', color: pastelColors[6]),
+              BarChartData(value: 91, label: 'Aug', color: pastelColors[7]),
+            ],
+            width: 800,
+            height: 300,
+            style: BarChartStyle(
+              barColor: const Color(0xFF7B9E87),
+              gridColor: const Color(0xFF34495E), // Darker grid for contrast
+              backgroundColor: const Color(0xFF16213E), // Dark background
+              barSpacing: 0.3,
+              cornerRadius: 12.0,
+              animationDuration: const Duration(milliseconds: 2000),
+              animationCurve: Curves.easeInOut,
+              gradientEffect: true,
+              gradientColors: const [Color(0xFFB8D4E3), Color(0xFF7B9E87)],
+              rotation: _chartRotations[0]!,
+              labelStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFFE8F4F8), // Light text for dark background
+              ),
+              valueStyle: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1A1A2E), // Dark text on light bars
+              ),
+            ),
+            showGrid: true,
+            showValues: true,
+            padding: const EdgeInsets.all(32),
+            horizontalGridLines: 6,
+            interactive: true,
+            onAnimationComplete: () {
+              print(
+                'Traditional bar chart animation completed! (Trigger: $_animationTrigger)',
+              );
+            },
           ),
         ),
-        showGrid: true,
-        showValues: true,
-        padding: const EdgeInsets.all(32),
-        horizontalGridLines: 6,
-        interactive: true,
-        onAnimationComplete: () {
-          print(
-            'Traditional bar chart animation completed! (Trigger: $_animationTrigger)',
-          );
-        },
-      ),
+      ],
     );
   }
 
   Widget _buildSimpleDataChart() {
-    return Container(
-      key: _chartKeys[1],
-      width: 1000,
-      height: 400,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF16213E), // Dark container
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
+    return Column(
+      children: [
+        _buildRotationControls(1),
+        Container(
+          key: _chartKeys[1],
+          width: 1000,
+          height: 400,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF16213E), // Dark container
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+            border: Border.all(color: const Color(0xFF2C3E50), width: 1),
           ),
-        ],
-        border: Border.all(color: const Color(0xFF2C3E50), width: 1),
-      ),
-      child: MaterialBarChart.fromData(
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-        values: [45, 78, 32, 89, 56, 67, 23, 91],
-        colors: pastelColorHex,
-        width: 800,
-        height: 300,
-        showGrid: true,
-        showValues: true,
-        padding: const EdgeInsets.all(32),
-        horizontalGridLines: 6,
-        interactive: true,
-        style: {
-          'barSpacing': 0.3,
-          'cornerRadius': 12.0,
-          'animationDuration': 2000,
-          'animationCurve': 'easeInOut',
-          'gradientEffect': true,
-          'gradientColors': ['#B8D4E3', '#7B9E87'],
-          'gridColor': '#34495E', // Darker grid
-          'backgroundColor': '#16213E', // Dark background
-        },
-        onAnimationComplete: () {
-          print(
-            'Simple data chart animation completed! (Trigger: $_animationTrigger)',
-          );
-        },
-      ),
+          child: MaterialBarChart.fromData(
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+            values: [45, 78, 32, 89, 56, 67, 23, 91],
+            colors: pastelColorHex,
+            width: 800,
+            height: 300,
+            showGrid: true,
+            showValues: true,
+            padding: const EdgeInsets.all(32),
+            horizontalGridLines: 6,
+            interactive: true,
+            style: {
+              'barSpacing': 0.3,
+              'cornerRadius': 12.0,
+              'animationDuration': 2000,
+              'animationCurve': 'easeInOut',
+              'gradientEffect': true,
+              'gradientColors': ['#B8D4E3', '#7B9E87'],
+              'gridColor': '#34495E', // Darker grid
+              'backgroundColor': '#16213E', // Dark background
+              'rotation': _chartRotations[1]!,
+            },
+            onAnimationComplete: () {
+              print(
+                'Simple data chart animation completed! (Trigger: $_animationTrigger)',
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildJsonChart() {
     final jsonConfig = {
       "data": [
-        {"x": "Jan", "y": 45, "color": "#F1C40F"},
-        {"x": "Feb", "y": 78, "color": "#E67E22"},
-        {"x": "Mar", "y": 32, "color": "#1ABC9C"},
-        {"x": "Apr", "y": 89, "color": "#3498DB"},
-        {"x": "May", "y": 56, "color": "#9B59B6"},
-        {"x": "Jun", "y": 67, "color": "#2ECC71"},
-        {"x": "Jul", "y": 23, "color": "#E74C3C"},
-        {"x": "Aug", "y": 91, "color": "#34495E"},
+        {
+          "type": "bar",
+          "x": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
+          "y": [45, 78, 32, 89, 56, 67, 23, 91],
+          "marker": {
+            "color": [
+              "#F1C40F",
+              "#E67E22",
+              "#1ABC9C",
+              "#3498DB",
+              "#9B59B6",
+              "#2ECC71",
+              "#E74C3C",
+              "#34495E",
+            ],
+            "colorscale": ["#B8D4E3", "#7B9E87"],
+          },
+        },
       ],
-      "style": {
+      "layout": {
         "width": 800,
         "height": 300,
-        "showGrid": true,
-        "showValues": true,
-        "padding": {"left": 32, "top": 32, "right": 32, "bottom": 32},
-        "horizontalGridLines": 6,
-        "interactive": true,
-        "barColor": "#7B9E87",
-        "gridColor": "#34495E",
-        "backgroundColor": "#16213E",
-        "barSpacing": 0.3,
-        "cornerRadius": 12.0,
-        "animationDuration": 2000,
-        "animationCurve": "easeInOut",
-        "gradientEffect": true,
-        "gradientColors": ["#B8D4E3", "#7B9E87"],
+        "plot_bgcolor": "#16213E",
+        "paper_bgcolor": "#16213E",
+        "showlegend": false,
+        "rotation": _chartRotations[2]!,
+        "bargap": 0.3,
+        "bargroupgap": 0.1,
+
+        "xaxis": {
+          "showgrid": true,
+          "gridcolor": "#34495E",
+          "tickfont": {"size": 16, "color": "#E8F4F8"},
+          "tickcolor": "#E8F4F8",
+          "title": {
+            "text": "Months",
+            "font": {"size": 18, "color": "#E8F4F8"},
+          },
+        },
+        "yaxis": {
+          "showgrid": true,
+          "gridcolor": "#34495E",
+          "nticks": 6,
+          "tickfont": {"size": 14, "color": "#E8F4F8"},
+          "tickcolor": "#E8F4F8",
+          "title": {
+            "text": "Values",
+            "font": {"size": 18, "color": "#E8F4F8"},
+          },
+        },
+
+        "font": {"size": 12, "color": "#E8F4F8"},
       },
     };
 
-    return Container(
-      key: _chartKeys[2],
-      width: 1000,
-      height: 400,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF16213E), // Dark container
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
+    return Column(
+      children: [
+        _buildRotationControls(2),
+        Container(
+          key: _chartKeys[2],
+          width: 1000,
+          height: 400,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF16213E),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+            border: Border.all(color: const Color(0xFF2C3E50), width: 1),
           ),
-        ],
-        border: Border.all(color: const Color(0xFF2C3E50), width: 1),
-      ),
-      child: MaterialBarChart.fromJson(jsonConfig),
+          child: MaterialBarChart.fromJson(jsonConfig),
+        ),
+      ],
     );
   }
 
   Widget _buildStreamChart() {
     return Column(
       children: [
+        // Rotation controls
+        _buildRotationControls(3),
+
         // Control buttons
         Container(
-          margin: const EdgeInsets.all(16.0),
+          margin: const EdgeInsets.only(bottom: 16.0),
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
             color: const Color(0xFF16213E), // Dark container
@@ -422,7 +476,7 @@ class _BarChartDemoState extends State<BarChartDemo> {
 
         // Status indicator
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
+          margin: const EdgeInsets.only(bottom: 16.0),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
             color:
@@ -477,8 +531,6 @@ class _BarChartDemoState extends State<BarChartDemo> {
           ),
         ),
 
-        const SizedBox(height: 24),
-
         // Chart
         Expanded(
           child: StreamBuilder<List<double>>(
@@ -532,6 +584,7 @@ class _BarChartDemoState extends State<BarChartDemo> {
                     'gradientColors': ['#B8D4E3', '#7B9E87'],
                     'gridColor': '#34495E', // Darker grid
                     'backgroundColor': '#16213E', // Dark background
+                    'rotation': _chartRotations[3]!,
                   },
                   onAnimationComplete: () {
                     if (_dataTimer?.isActive == true) {
@@ -611,5 +664,77 @@ class _BarChartDemoState extends State<BarChartDemo> {
       _streamData = [45, 78, 32, 89, 56, 67, 23, 91];
       _streamController?.add(_streamData);
     });
+  }
+
+  void _setRotation(int chartIndex, double rotation) {
+    setState(() {
+      _chartRotations[chartIndex] = rotation;
+    });
+  }
+
+  Widget _buildRotationControls(int chartIndex) {
+    final rotations = [0.0, 90.0, 180.0, 270.0];
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16213E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF2C3E50), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Rotation: ',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFFE8F4F8),
+            ),
+          ),
+          const SizedBox(width: 12),
+          ...rotations.map((rotation) {
+            final isSelected = _chartRotations[chartIndex] == rotation;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: ElevatedButton(
+                onPressed: () => _setRotation(chartIndex, rotation),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      isSelected ? const Color(0xFF7B9E87) : Colors.transparent,
+                  foregroundColor:
+                      isSelected
+                          ? const Color(0xFF1A1A2E)
+                          : const Color(0xFFE8F4F8),
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  side:
+                      isSelected
+                          ? null
+                          : BorderSide(
+                            color: const Color(0xFF2C3E50),
+                            width: 1,
+                          ),
+                ),
+                child: Text(
+                  '${rotation.toInt()}°',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
   }
 }
